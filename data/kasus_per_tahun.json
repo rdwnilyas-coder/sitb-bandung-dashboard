@@ -1,0 +1,92 @@
+[
+ {
+  "tahun": 2021,
+  "register": "TBC RO",
+  "jumlah": 280
+ },
+ {
+  "tahun": 2021,
+  "register": "TBC SO",
+  "jumlah": 8872
+ },
+ {
+  "tahun": 2021,
+  "register": "Terduga TBC (TB.06)",
+  "jumlah": 16380
+ },
+ {
+  "tahun": 2022,
+  "register": "TBC RO",
+  "jumlah": 382
+ },
+ {
+  "tahun": 2022,
+  "register": "TBC SO",
+  "jumlah": 14800
+ },
+ {
+  "tahun": 2022,
+  "register": "Terduga TBC (TB.06)",
+  "jumlah": 16380
+ },
+ {
+  "tahun": 2023,
+  "register": "TBC RO",
+  "jumlah": 392
+ },
+ {
+  "tahun": 2023,
+  "register": "TBC SO",
+  "jumlah": 16379
+ },
+ {
+  "tahun": 2023,
+  "register": "Terduga TBC (TB.06)",
+  "jumlah": 16380
+ },
+ {
+  "tahun": 2024,
+  "register": "TBC RO",
+  "jumlah": 304
+ },
+ {
+  "tahun": 2024,
+  "register": "TBC SO",
+  "jumlah": 16379
+ },
+ {
+  "tahun": 2024,
+  "register": "Terduga TBC (TB.06)",
+  "jumlah": 16380
+ },
+ {
+  "tahun": 2025,
+  "register": "TBC RO",
+  "jumlah": 226
+ },
+ {
+  "tahun": 2025,
+  "register": "TBC SO",
+  "jumlah": 16379
+ },
+ {
+  "tahun": 2025,
+  "register": "Terduga TBC (TB.06)",
+  "jumlah": 16380
+ },
+ {
+  "tahun": 2026,
+  "register": "TBC RO",
+  "jumlah": 116
+ },
+ {
+  "tahun": 2026,
+  "register": "TBC SO",
+  "jumlah": 7483
+ },
+ {
+  "tahun": 2026,
+  "register": "Terduga TBC (TB.06)",
+  "jumlah": 16380
+ }
+]

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard TBC Kota Bandung 2021–2026</title>
+<style>
+  :root{--navy:#0F2E4E;--blue:#2A78D6;--line:#e2e1dd;--mut:#52514e;--bg:#f7f7f5}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,sans-serif;color:#0b0b0b;background:var(--bg)}
+  header{background:var(--navy);color:#fff;padding:22px 20px}
+  header h1{margin:0;font-size:1.3rem} header p{margin:5px 0 0;font-size:.85rem;color:#9ab6e0}
+  .wrap{max-width:960px;margin:22px auto;padding:0 16px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  a.card{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;transition:.15s}
+  a.card:hover{border-color:var(--blue);box-shadow:0 3px 12px rgba(16,24,40,.1);transform:translateY(-1px)}
+  a.card.primary{border-color:var(--blue);border-width:2px}
+  a.card h2{margin:0 0 4px;font-size:1.02rem;color:var(--navy)}
+  a.card p{margin:0;font-size:.82rem;color:var(--mut);line-height:1.4}
+  .tag{display:inline-block;font-size:.66rem;font-weight:700;color:#fff;background:var(--blue);border-radius:20px;padding:2px 9px;margin-bottom:8px}
+  table{border-collapse:collapse;width:100%;margin-top:10px;font-size:.85rem;background:#fff}
+  th,td{border:1px solid var(--line);padding:.4rem .7rem;text-align:left} th{background:#f2f2f2}
+  h3{color:var(--navy);margin:26px 0 8px;font-size:1rem}
+  footer{color:var(--mut);font-size:.72rem;margin:26px 0 10px;line-height:1.5}
+</style>
+</head>
+<body>
+<header>
+  <h1>Dashboard TBC Kota Bandung 2021–2026</h1>
+  <p>Analisis kaskade & investigasi kontak pasien TBC · data SITB/SITK · Penelitian Unpad</p>
+</header>
+<div class="wrap">
+  <div class="cards">
+    <a class="card primary" href="cascade_spatial.html">
+      <span class="tag">Dashboard utama</span>
+      <h2>Cascade Spasio-Temporal →</h2>
+      <p>Peta kaskade TBC per kecamatan/kelurahan, drill-down, slider tahun, metrik, titik faskes, tren bulanan, dan analisis kemampuan faskes.</p>
+    </a>
+    <a class="card" href="alur_proses.html">
+      <h2>Diagram Alur Proses →</h2>
+      <p>Alur kaskade Terduga → Terdiagnosis → Sembuh, tersambung ke funnel Investigasi Kontak & TPT (angka agregat).</p>
+    </a>
+    <a class="card" href="struktur.html">
+      <h2>Struktur Data →</h2>
+      <p>Pohon tabel & kolom SITB dengan jumlah baris dan missing value per kolom.</p>
+    </a>
+  </div>
+
+  <h3>Ringkasan kasus per tahun</h3>
+  <table id="tabel"><thead><tr><th>Tahun</th><th>Register</th><th>Jumlah</th></tr></thead><tbody></tbody></table>
+
+  <footer>
+    Situs statis (HTML + JS + JSON agregat). Hanya menampilkan angka agregat — tanpa data individu/PII.
+    Sumber: laporan SITB/SITK Dinkes Kota Bandung 2021–2026.
+  </footer>
+</div>
+<script>
+  fetch("data/kasus_per_tahun.json").then(r=>r.json()).then(rows=>{
+    document.querySelector("#tabel tbody").innerHTML = rows
+      .map(r=>`<tr><td>${r.tahun}</td><td>${r.register}</td><td>${r.jumlah}</td></tr>`).join("");
+  }).catch(()=>{ document.querySelector("#tabel tbody").innerHTML='<tr><td colspan="3">data/kasus_per_tahun.json tak termuat</td></tr>'; });
+</script>
+</body>
+</html>

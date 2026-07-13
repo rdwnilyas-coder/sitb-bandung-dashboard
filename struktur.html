@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Struktur Data — TBC Kota Bandung</title>
+  <style>
+    :root {
+      --surface: #fcfcfb;
+      --surface-2: #f0efec;
+      --text-1: #0b0b0b;
+      --text-2: #52514e;
+      --bar: #2a78d6;
+      --track: #e4e3df;
+      --border: #d8d7d2;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --surface: #1a1a19;
+        --surface-2: #242423;
+        --text-1: #ffffff;
+        --text-2: #c3c2b7;
+        --bar: #3987e5;
+        --track: #343432;
+        --border: #3c3c3a;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: var(--surface); color: var(--text-1);
+      margin: 2rem auto; max-width: 1000px; padding: 0 1rem;
+    }
+    h1 { font-size: 1.4rem; }
+    p.sub, a { color: var(--text-2); }
+    input[type=search] {
+      width: 100%; padding: .55rem .8rem; margin: 1rem 0;
+      border: 1px solid var(--border); border-radius: 8px;
+      background: var(--surface-2); color: var(--text-1); font-size: .95rem;
+    }
+    details.tabel {
+      border: 1px solid var(--border); border-radius: 10px;
+      margin-bottom: .8rem; background: var(--surface-2); overflow: hidden;
+    }
+    details.tabel > summary {
+      cursor: pointer; padding: .8rem 1rem; list-style: none;
+      display: flex; flex-wrap: wrap; gap: .3rem 1rem; align-items: baseline;
+    }
+    details.tabel > summary::before { content: "▸"; color: var(--text-2); margin-right: .2rem; }
+    details.tabel[open] > summary::before { content: "▾"; }
+    .tname { font-family: ui-monospace, monospace; font-weight: 700; }
+    .tmeta { color: var(--text-2); font-size: .85rem; }
+    .kolom-list { padding: 0 1rem 1rem; }
+    .krow {
+      display: grid; grid-template-columns: minmax(180px, 34%) 1fr max-content;
+      gap: .8rem; align-items: center; padding: .28rem .4rem; border-radius: 6px;
+    }
+    .krow:hover { background: var(--track); }
+    .knama { font-family: ui-monospace, monospace; font-size: .8rem; overflow-wrap: anywhere; }
+    .ktipe { color: var(--text-2); font-size: .72rem; }
+    .track { background: var(--track); border-radius: 4px; height: 10px; position: relative; }
+    .fill { background: var(--bar); border-radius: 4px; height: 100%; min-width: 2px; }
+    .fill.nol { min-width: 0; width: 0; }
+    .kangka { font-size: .78rem; color: var(--text-2); white-space: nowrap; text-align: right; }
+    .kangka b { color: var(--text-1); font-weight: 600; }
+    .kolom-head {
+      display: grid; grid-template-columns: minmax(180px, 34%) 1fr max-content;
+      gap: .8rem; padding: .2rem .4rem .4rem; color: var(--text-2); font-size: .72rem;
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pohon Struktur Data — Database <code>sitb_bandung</code></h1>
+  <p class="sub">Jumlah data terisi dan missing value per kolom. Missing = NULL atau string kosong.
+    Sumber: <code>data/struktur_data.json</code> (digenerate <code>analytics/agg_struktur_data.py</code>).
+    <a href="index.html">← kembali</a></p>
+  <input type="search" id="cari" placeholder="Cari nama kolom… (mis. diagnosis, hiv, kontak)">
+  <div id="pohon"></div>
+
+  <script>
+    const fmt = n => n.toLocaleString("id-ID");
+
+    fetch("data/struktur_data.json").then(r => r.json()).then(tabels => {
+      document.getElementById("pohon").innerHTML = tabels.map(t => `
+        <details class="tabel">
+          <summary>
+            <span class="tname">${t.tabel}</span>
+            <span class="tmeta">${t.deskripsi}</span>
+            <span class="tmeta"><b>${fmt(t.baris)}</b> baris · ${t.kolom.length} kolom</span>
+          </summary>
+          <div class="kolom-list">
+            <div class="kolom-head"><span>Kolom</span><span>Terisi</span><span>Terisi / Missing</span></div>
+            ${t.kolom.map(k => {
+              const pctTerisi = t.baris ? (100 * k.terisi / t.baris) : 0;
+              return `
+              <div class="krow" data-nama="${k.nama}"
+                   title="${k.nama} — terisi ${fmt(k.terisi)} (${pctTerisi.toFixed(1)}%), missing ${fmt(k.missing)} (${k.pct_missing}%)">
+                <div><div class="knama">${k.nama}</div><div class="ktipe">${k.tipe}</div></div>
+                <div class="track"><div class="fill ${k.terisi === 0 ? "nol" : ""}" style="width:${pctTerisi}%"></div></div>
+                <div class="kangka"><b>${fmt(k.terisi)}</b> terisi · ${fmt(k.missing)} missing (${k.pct_missing}%)</div>
+              </div>`;
+            }).join("")}
+          </div>
+        </details>`).join("");
+
+      // filter kolom; tabel tanpa hasil ikut disembunyikan, tabel dengan hasil dibuka
+      document.getElementById("cari").addEventListener("input", e => {
+        const q = e.target.value.trim().toLowerCase();
+        document.querySelectorAll("details.tabel").forEach(d => {
+          let ada = 0;
+          d.querySelectorAll(".krow").forEach(row => {
+            const cocok = !q || row.dataset.nama.includes(q);
+            row.style.display = cocok ? "" : "none";
+            if (cocok) ada++;
+          });
+          d.style.display = ada ? "" : "none";
+          if (q) d.open = ada > 0;
+        });
+      });
+    });
+  </script>
+</body>
+</html>
