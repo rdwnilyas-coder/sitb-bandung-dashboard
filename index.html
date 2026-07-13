@@ -11,8 +11,11 @@
   :root{--navy:#0F2E4E;--blue:#2A78D6;--ink:#0b0b0b;--mut:#52514e;--line:#e2e1dd;--bg:#f7f7f5;}
   *{box-sizing:border-box}
   body{margin:0;font-family:system-ui,sans-serif;color:var(--ink);background:var(--bg)}
-  header{background:var(--navy);color:#fff;padding:14px 20px}
+  header{background:var(--navy);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px}
   header h1{margin:0;font-size:1.15rem} header p{margin:3px 0 0;font-size:.8rem;color:#9ab6e0}
+  .brand-logo{background:#fff;border-radius:12px;padding:6px 12px;display:flex;align-items:center;justify-content:center;min-width:66px;min-height:54px;box-shadow:0 1px 4px rgba(0,0,0,.18);flex:0 0 auto}
+  .brand-logo img{height:46px;width:auto;display:block}
+  .logo-fb{color:var(--navy);font-weight:800;font-size:1.1rem;letter-spacing:.5px}
   .wrap{max-width:1280px;margin:0 auto;padding:14px 16px}
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
   .kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
@@ -73,9 +76,14 @@
 </head>
 <body>
 <header>
-  <h1>Cascade Spasio-Temporal TBC — Kota Bandung</h1>
-  <p>Kaskade pasien TBC · drill-down kecamatan → kelurahan · analisis faskes · SITB 2021–2026 · Penelitian Unpad ·
-     <a href="alur_proses.html" style="color:#bfe0ff">diagram alur proses →</a></p>
+  <div class="brand-logo">
+    <img src="logo_unpad.png" alt="Universitas Padjadjaran" onerror="this.style.display='none';this.nextElementSibling.hidden=false">
+    <span class="logo-fb" hidden>UNPAD</span>
+  </div>
+  <div>
+    <h1>Cascade Spasio-Temporal TBC — Kota Bandung</h1>
+    <p>Kaskade pasien TBC · drill-down kecamatan → kelurahan · analisis faskes · SITB 2021–2026 · Penelitian Unpad</p>
+  </div>
 </header>
 <div class="wrap">
   <div class="kpis" id="kpis"></div>
