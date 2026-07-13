@@ -3,62 +3,589 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dashboard TBC Kota Bandung 2021–2026</title>
+<title>Cascade Spasio-Temporal TBC — Kota Bandung</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
-  :root{--navy:#0F2E4E;--blue:#2A78D6;--line:#e2e1dd;--mut:#52514e;--bg:#f7f7f5}
+  :root{--navy:#0F2E4E;--blue:#2A78D6;--ink:#0b0b0b;--mut:#52514e;--line:#e2e1dd;--bg:#f7f7f5;}
   *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,sans-serif;color:#0b0b0b;background:var(--bg)}
-  header{background:var(--navy);color:#fff;padding:22px 20px}
-  header h1{margin:0;font-size:1.3rem} header p{margin:5px 0 0;font-size:.85rem;color:#9ab6e0}
-  .wrap{max-width:960px;margin:22px auto;padding:0 16px}
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-  a.card{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;transition:.15s}
-  a.card:hover{border-color:var(--blue);box-shadow:0 3px 12px rgba(16,24,40,.1);transform:translateY(-1px)}
-  a.card.primary{border-color:var(--blue);border-width:2px}
-  a.card h2{margin:0 0 4px;font-size:1.02rem;color:var(--navy)}
-  a.card p{margin:0;font-size:.82rem;color:var(--mut);line-height:1.4}
-  .tag{display:inline-block;font-size:.66rem;font-weight:700;color:#fff;background:var(--blue);border-radius:20px;padding:2px 9px;margin-bottom:8px}
-  table{border-collapse:collapse;width:100%;margin-top:10px;font-size:.85rem;background:#fff}
-  th,td{border:1px solid var(--line);padding:.4rem .7rem;text-align:left} th{background:#f2f2f2}
-  h3{color:var(--navy);margin:26px 0 8px;font-size:1rem}
-  footer{color:var(--mut);font-size:.72rem;margin:26px 0 10px;line-height:1.5}
+  body{margin:0;font-family:system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+  header{background:var(--navy);color:#fff;padding:14px 20px}
+  header h1{margin:0;font-size:1.15rem} header p{margin:3px 0 0;font-size:.8rem;color:#9ab6e0}
+  .wrap{max-width:1280px;margin:0 auto;padding:14px 16px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .kpi b{display:block;font-size:1.5rem;color:var(--navy)} .kpi span{font-size:.75rem;color:var(--mut)}
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:10px}
+  .yrs button{border:1px solid var(--line);background:#fff;padding:5px 11px;border-radius:20px;cursor:pointer;font-size:.82rem;margin-right:4px}
+  .yrs button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+  select{padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:.85rem}
+  #drillBtn{padding:7px 14px;border:1px solid var(--blue);background:var(--blue);color:#fff;border-radius:8px;cursor:pointer;font-size:.82rem;font-weight:600;margin-bottom:8px;width:100%}
+  label.chk{font-size:.82rem;color:var(--mut);cursor:pointer;user-select:none}
+  .crumb{font-size:.82rem;color:var(--mut)} .crumb b{color:var(--navy)}
+  .grid{display:grid;grid-template-columns:1.55fr 1fr;gap:12px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+  #map{height:560px;border-radius:10px;border:1px solid var(--line)}
+  .mainrow{display:grid;grid-template-columns:1fr 450px;gap:12px;align-items:stretch}
+  @media(max-width:1080px){.mainrow{grid-template-columns:1fr}}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  .alur-panel{display:flex;flex-direction:column}
+  .alur-panel svg{width:100%;flex:1;min-height:0;display:block;margin-top:4px}
+  .alur-panel .n-lab{font-weight:700;fill:var(--navy)}
+  .alur-panel .n-val{font-weight:800}
+  .alur-panel .n-sub{fill:#9aa0a8;font-size:10px}
+  .alur-panel .e-lab{fill:var(--mut);font-size:11px}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px}
+  #trend{height:280px}
+  .legend{background:#fff;padding:8px 10px;border-radius:8px;border:1px solid var(--line);font-size:.72rem;line-height:1.5;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .legend i{display:inline-block;width:14px;height:12px;margin-right:5px;vertical-align:-1px}
+  .lbl{background:rgba(255,255,255,.72);border:none;box-shadow:none;font-size:9px;font-weight:700;color:#0F2E4E;padding:0 1px;white-space:nowrap} .lbl:before{display:none}
+  .proc{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+  .stage{flex:1 1 0;min-width:130px;border:1.5px solid;border-radius:10px;padding:10px 8px;text-align:center}
+  .stage .nm{font-size:.78rem;color:var(--mut)} .stage .ct{font-size:1.5rem;font-weight:800} .stage .sr{font-size:.62rem;color:#9a9a9a}
+  .arrow{flex:0 0 100px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--navy)}
+  .arrow .ar{font-size:1.1rem;line-height:1;color:#8aa} .arrow .lg{font-size:.95rem;font-weight:800;margin-top:2px} .arrow .un{font-size:.62rem;color:var(--mut);text-align:center;line-height:1.35}
+  @media(max-width:760px){.arrow{flex-basis:100%;flex-direction:row;gap:6px;padding:4px 0}.stage{flex-basis:100%}}
+  .ik-conn{margin:14px 0 8px;font-size:.82rem;color:var(--navy)}
+  .stage.ik{border-color:#7e5fd6;background:#7e5fd60f} .stage.ik .ct{color:#5f3fbf;font-size:1.25rem}
+  .ik-loop{margin-top:8px;border:1.5px dashed #e07b2e;background:#fff3e8;border-radius:10px;padding:7px 10px;font-size:.72rem;color:#8a3d08;display:inline-block}
+  .ik-loop b{font-size:1.05rem;color:#c0392b}
+  .fmk-wrap{background:transparent;border:0}
+  .fmk{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;color:#fff;font-size:9px;font-weight:700;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.45)} .fmk.sm{width:15px;height:15px}
+  .faskes-ctrl{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;box-shadow:0 2px 8px rgba(16,24,40,.18);font-size:12px;max-width:210px}
+  .faskes-ctrl .fc-head{display:flex;justify-content:space-between;margin-bottom:6px} .faskes-ctrl .fc-head span{color:var(--mut)}
+  .faskes-ctrl .fc-row{display:flex;align-items:center;gap:6px;padding:2px 0;cursor:pointer;margin:0} .faskes-ctrl .fc-row input{cursor:pointer;margin:0}
+  .faskes-ctrl .fc-lab{flex:1} .faskes-ctrl .fc-n{color:var(--mut);font-variant-numeric:tabular-nums}
+  .faskes-ctrl .fc-foot{margin-top:6px;border-top:1px solid var(--line);padding-top:5px;font-size:11px;color:var(--mut)}
+  .leaflet-tooltip.tbtip{background:#111826;color:#fff;border:0;border-radius:8px;padding:8px 10px;font-size:12.5px;box-shadow:0 4px 14px rgba(0,0,0,.25)} .leaflet-tooltip.tbtip b{font-size:13px}
+  .fkgrid{display:grid;grid-template-columns:1.35fr 1fr;gap:16px} @media(max-width:760px){.fkgrid{grid-template-columns:1fr}}
+  .fkflow{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+  .fkslider{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--mut);margin:2px 0 6px} .fkslider input[type=range]{flex:0 0 220px}
+  .fkh{font-weight:700;color:var(--navy);font-size:.82rem;margin-bottom:6px}
+  .frank{margin:7px 0;font-size:.75rem}
+  .frank .fn2{color:#333;line-height:1.25;margin-bottom:2px}
+  .frank .fr{display:flex;align-items:center;gap:6px}
+  .frank .fb{flex:1;background:#eef3fb;border-radius:4px} .frank .fb>span{display:block;height:10px;border-radius:4px}
+  .frank .fk{flex:0 0 40px;text-align:right;font-weight:700} .frank .fp{flex:0 0 92px;text-align:right;color:var(--mut);font-size:.68rem}
 </style>
 </head>
 <body>
 <header>
-  <h1>Dashboard TBC Kota Bandung 2021–2026</h1>
-  <p>Analisis kaskade & investigasi kontak pasien TBC · data SITB/SITK · Penelitian Unpad</p>
+  <h1>Cascade Spasio-Temporal TBC — Kota Bandung</h1>
+  <p>Kaskade pasien TBC · drill-down kecamatan → kelurahan · analisis faskes · SITB 2021–2026 · Penelitian Unpad ·
+     <a href="alur_proses.html" style="color:#bfe0ff">diagram alur proses →</a></p>
 </header>
 <div class="wrap">
-  <div class="cards">
-    <a class="card primary" href="cascade_spatial.html">
-      <span class="tag">Dashboard utama</span>
-      <h2>Cascade Spasio-Temporal →</h2>
-      <p>Peta kaskade TBC per kecamatan/kelurahan, drill-down, slider tahun, metrik, titik faskes, tren bulanan, dan analisis kemampuan faskes.</p>
-    </a>
-    <a class="card" href="alur_proses.html">
-      <h2>Diagram Alur Proses →</h2>
-      <p>Alur kaskade Terduga → Terdiagnosis → Sembuh, tersambung ke funnel Investigasi Kontak & TPT (angka agregat).</p>
-    </a>
-    <a class="card" href="struktur.html">
-      <h2>Struktur Data →</h2>
-      <p>Pohon tabel & kolom SITB dengan jumlah baris dan missing value per kolom.</p>
-    </a>
+  <div class="kpis" id="kpis"></div>
+  <div class="controls">
+    <div class="yrs" id="yrs"></div>
+    <label>Metrik: <select id="metric">
+        <option value="kasus">Jumlah kasus</option>
+        <option value="rate">Rate / 100.000 penduduk</option>
+        <option value="keberhasilan">Kesembuhan pengobatan (%)</option>
+        <option value="ikpct">Investigasi kontak dilakukan (%)</option>
+        <option value="belumik">Belum IK / gap investigasi (%)</option>
+        <option value="tpt">Penerima TPT (kontak)</option>
+      </select></label>
+    <label>Batas: <select id="cityUnit"><option value="kec">Kecamatan</option><option value="kel">Kelurahan</option></select></label>
+    <label>Kecamatan: <select id="kecSel"></select></label>
+    <label class="chk"><input type="checkbox" id="tNum"> Tampilkan angka</label>
+    <span class="crumb" id="crumb"></span>
   </div>
 
-  <h3>Ringkasan kasus per tahun</h3>
-  <table id="tabel"><thead><tr><th>Tahun</th><th>Register</th><th>Jumlah</th></tr></thead><tbody></tbody></table>
+  <div class="mainrow">
+    <div id="map"></div>
+    <div class="panel alur-panel">
+      <div style="font-weight:700;color:var(--navy)">Kaskade proses &amp; Investigasi Kontak
+        <span id="procYr" style="font-weight:400;color:var(--mut);font-size:.76rem"></span></div>
+      <svg id="flow" viewBox="0 18 760 832" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Alur proses kaskade TBC + Investigasi Kontak"></svg>
+    </div>
+  </div>
 
-  <footer>
-    Situs statis (HTML + JS + JSON agregat). Hanya menampilkan angka agregat — tanpa data individu/PII.
-    Sumber: laporan SITB/SITK Dinkes Kota Bandung 2021–2026.
-  </footer>
+  <div class="grid2" id="cityWrap" style="margin-top:12px">
+    <div class="panel">
+      <button id="drillBtn" style="display:none">Drill down ke kelurahan ▾</button>
+      <div style="font-weight:700;color:var(--navy);margin-bottom:6px" id="trendHead">Tren bulanan kota</div>
+      <div id="trend"></div>
+    </div>
+    <div class="panel">
+      <div style="font-weight:700;color:var(--navy);margin-bottom:6px" id="topHead">Kecamatan teratas</div>
+      <div id="top"></div>
+    </div>
+  </div>
+  <div class="panel" id="detailPanel" style="display:none;margin-top:12px"></div>
+
+  <div class="panel" style="margin-top:12px">
+    <div style="font-weight:700;color:var(--navy);margin-bottom:8px">Analisis Kemampuan Faskes menangani Cascade
+      <span id="fkCtx" style="font-weight:400;color:var(--mut);font-size:.8rem"></span></div>
+    <div class="fkgrid">
+      <div><div class="fkh">Peringkat faskes — volume · kesembuhan · IK</div><div id="fkRank"></div></div>
+      <div><div class="fkh">Domisili: dirawat di dalam vs luar kecamatan</div><div id="fkDonut" style="height:260px"></div></div>
+    </div>
+    <div class="fkflow">
+      <div class="fkh">Aliran domisili → faskes (kecamatan)</div>
+      <div class="fkslider">Jumlah aliran ditampilkan: <input type="range" id="fkN" min="5" max="40" value="14"> <b id="fkNv">14</b> teratas</div>
+      <div id="fkFlow" style="height:420px"></div>
+    </div>
+  </div>
 </div>
 <script>
-  fetch("data/kasus_per_tahun.json").then(r=>r.json()).then(rows=>{
-    document.querySelector("#tabel tbody").innerHTML = rows
-      .map(r=>`<tr><td>${r.tahun}</td><td>${r.register}</td><td>${r.jumlah}</td></tr>`).join("");
-  }).catch(()=>{ document.querySelector("#tabel tbody").innerHTML='<tr><td colspan="3">data/kasus_per_tahun.json tak termuat</td></tr>'; });
+const RAMPS={
+  kasus:['#eaf2fb','#cde2fb','#9ec5f4','#6da7ec','#3987e5','#256abf','#184f95','#0d366b'],
+  rate:['#e6f5f3','#c7e9e2','#9ed9cd','#66c2b0','#35a48f','#1f8a76','#0f6b5a','#054a3d'],
+  keberhasilan:['#eef8ea','#d6efcc','#b3e0a1','#84cc77','#57b34f','#369a3a','#1f7a2e','#0d5a20'],
+  ikpct:['#fff4e6','#ffe1bf','#ffc98a','#ffab52','#f78c2a','#e06e12','#b8540b','#8a3d08']
+};
+const RB=['#cfe0f5','#9ec5f4','#6da7ec','#3987e5','#256abf','#184f95','#0d366b'];
+RAMPS.belumik=['#fdecEb','#fbd5d3','#f5a9a5','#ee7b74','#e34948','#c0392b','#9b2b26','#6f1e1a'];
+RAMPS.tpt=['#efeafb','#dcd2f5','#c0b0ec','#9f88e2','#7e5fd6','#5f3fbf','#472f96','#33206f'];
+const LAB={kasus:'Kasus',rate:'Rate/100k',keberhasilan:'Sembuh %',ikpct:'IK %',belumik:'Belum IK %',tpt:'Penerima TPT'};
+const STC=['#2A78D6','#1baf7a','#eda100','#008300'];
+const CITY=[-6.914,107.61];
+/* ===== diagram alur vertikal (SVG, angka dinamis) ===== */
+const FW=200,FH=62;
+const FN={
+  terduga:  {cx:180, y:30,  lab:'Terduga TBC',        sub:'tb06',        grp:'main'},
+  diagnosis:{cx:180, y:136, lab:'Terdiagnosis TBC',   sub:'kasus indeks · tb06', grp:'main'},
+  mulai:    {cx:180, y:242, lab:'Mulai pengobatan',   sub:'tb03',        grp:'main'},
+  berhasil: {cx:180, y:348, lab:'Sembuh',           sub:'Sembuh + Peng. lengkap', grp:'main'},
+  ik:       {cx:480, y:136, lab:'Investigasi Kontak', sub:'kasus indeks ber-IK', grp:'ik', hdr:true},
+  kontak:   {cx:480, y:242, lab:'Total kontak',       sub:'serumah + erat', grp:'ik'},
+  invest:   {cx:480, y:348, lab:'Diinvestigasi',      sub:'dikunjungi', grp:'ik'},
+  periksa:  {cx:480, y:454, lab:'Diperiksa',          sub:'skrining kontak', grp:'ik'},
+  sakit:    {cx:330, y:560, lab:'Sakit TBC',          sub:'kontak jadi kasus', grp:'sick'},
+  eligible: {cx:620, y:560, lab:'Eligible TPT',       sub:'memenuhi syarat', grp:'ik'},
+  penerima: {cx:620, y:666, lab:'Penerima TPT',       sub:'mulai profilaksis', grp:'ik'},
+  selesai:  {cx:620, y:772, lab:'Selesai TPT',        sub:'tuntas profilaksis', grp:'ik'},
+};
+for(const k in FN){const n=FN[k]; n.w=FW; n.h=FH; n.x=n.cx-FW/2; n.cy=n.y+FH/2;}
+const FSTYLE={main:{fill:'#eaf2fb',stroke:'#2A78D6',val:'#184f95'},
+              ik:{fill:'#efeafb',stroke:'#5f3fbf',val:'#472f96'},
+              sick:{fill:'#fff3e8',stroke:'#e07b2e',val:'#c0392b'}};
+const FE=[
+  ['terduga','diagnosis','v'],['diagnosis','mulai','v'],['mulai','berhasil','v'],
+  ['diagnosis','ik','h','memicu IK'],
+  ['ik','kontak','v'],['kontak','invest','v'],['invest','periksa','v'],
+  ['periksa','sakit','branch'],['periksa','eligible','branch'],
+  ['eligible','penerima','v'],['penerima','selesai','v'],
+  ['sakit','diagnosis','loop','kontak sakit → kasus baru'],
+];
+function fEdge(a,b,type){
+  if(type==='h'){ const x1=a.cx+a.w/2,y1=a.cy,x2=b.cx-b.w/2,y2=b.cy; return {d:`M${x1},${y1} L${x2},${y2}`,lx:(x1+x2)/2,ly:y1-8}; }
+  if(type==='loop'){ const x1=a.x,y1=a.cy,x2=b.x,y2=b.cy,cx=46;
+    return {d:`M${x1},${y1} H${cx} V${y2} H${x2}`, lx:cx-9, ly:(y1+y2)/2, loop:true}; }
+  if(type==='branch'){ const x1=a.cx,y1=a.y+a.h,x2=b.cx,y2=b.y,mY=y1+(y2-y1)/2;
+    return {d:`M${x1},${y1} V${mY} H${x2} V${y2}`, lx:(x1+x2)/2, ly:mY-6}; }
+  const x1=a.cx,y1=a.y+a.h,x2=b.cx,y2=b.y; return {d:`M${x1},${y1} L${x2},${y2}`, lx:x1+9, ly:(y1+y2)/2+3, anchor:'start'};
+}
+function drawAlur(vals, dyn){
+  const parts=[`<defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5b6470"/></marker>
+    <marker id="arrLoop" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>`];
+  for(const [a,b,t,slab] of FE){
+    const p=fEdge(FN[a],FN[b],t), loop=t==='loop', dv=dyn&&dyn[a+'-'+b], lab=dv||slab, anc=loop?'middle':(p.anchor||'middle');
+    parts.push(`<path d="${p.d}" fill="none" stroke="${loop?'#c0392b':'#5b6470'}" stroke-width="${loop?2.2:1.6}" ${loop?'stroke-dasharray="7 5"':''} marker-end="url(#${loop?'arrLoop':'arr'})"/>`);
+    if(dv)                                              // lag: nilai hari + baris "lag median"
+      parts.push(`<text class="e-lab" x="${p.lx}" y="${p.ly-3}" text-anchor="${anc}"><tspan x="${p.lx}" font-weight="700" fill="#0F2E4E">${dv}</tspan><tspan x="${p.lx}" dy="10" fill="#9aa0a8" font-size="9">lag median</tspan></text>`);
+    else if(lab)
+      parts.push(`<text class="e-lab" x="${p.lx}" y="${p.ly}" text-anchor="${anc}" ${loop?`fill="#c0392b" font-weight="700" transform="rotate(-90 ${p.lx} ${p.ly})"`:''}>${lab}</text>`);
+  }
+  for(const k in FN){const n=FN[k], s=FSTYLE[n.grp], v=vals[k];
+    parts.push(`<g><rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="11" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${n.hdr?2.4:1.6}"/>`+
+      `<text class="n-lab" x="${n.cx}" y="${n.y+22}" text-anchor="middle" font-size="13">${n.lab}</text>`+
+      `<text class="n-val" x="${n.cx}" y="${n.y+43}" text-anchor="middle" font-size="17" fill="${s.val}">${v==null?'':fmt(v)}</text>`+
+      `<text class="n-sub" x="${n.cx}" y="${n.y+55}" text-anchor="middle">${n.sub}</text></g>`);
+  }
+  document.getElementById('flow').innerHTML=parts.join('');
+}
+const lagfmt=lg=>(lg&&lg.median_hari!=null)?(lg.median_hari>=30?(lg.median_hari/30.44).toFixed(1)+' bln':lg.median_hari+' hr'):null;
+let DATA,FDATA,RWDATA,GEO_KEL,GEO_KEC,FASKB,master={},kelCentroid={},kecCentroid={},kecName={},kecBounds={},cityBounds;
+// zoom 12 spt semula, lalu geser kanan ~100px → kota tampil ke kiri, tak tertutup panel titik faskes (kontrol topright)
+function viewKota(){ map.setView(CITY,12,{animate:false}); map.panBy([100,0],{animate:false}); }
+let layer,map,legendCtl,labelLayer;
+let year='semua',metric='kasus',showNum=false,level='kota',cityUnit='kec',selKec=null,selKel=null,selLayer=null,pickedKec=null,pickLayer=null;
+let faskesCtrl=null,faskesGroups={},faskesActive=new Set();
+const norm=s=>String(s).toUpperCase().replace(/[^A-Z0-9]/g,'');
+const fmt=n=>n==null?'–':n.toLocaleString('id-ID');
+const chart=id=>{const el=document.getElementById(id);return echarts.getInstanceByDom(el)||echarts.init(el);};
+const mode=()=> level==='kec' ? 'drill' : (cityUnit==='kel'?'kotakel':'kotakec');
+const FOCUS=()=> level==='kec'?selKec:pickedKec;  // kecamatan aktif utk statistik/faskes/aliran
+
+/* ---------- faskes (persis tb-jabar, re-callable) ---------- */
+const FASKES_TYPES=[
+  {key:'Puskesmas',color:'#159e8f',mk:'P',label:'Puskesmas'},
+  {key:'Rumah Sakit',color:'#1d54a0',mk:'H',label:'Rumah Sakit'},
+  {key:'Klinik',color:'#e0710f',mk:'K',label:'Klinik'},
+  {key:'Lapas/Rutan',color:'#64748b',mk:'L',label:'Lapas/Rutan'},
+  {key:'Dokter Praktik Mandiri',color:'#8247bf',mk:'D',label:'Dokter Praktik Mandiri'},
+  {key:'BP4/ BBKPM/ BKPM',color:'#c0392b',mk:'B',label:'BP4/BBKPM/BKPM'},
+];
+const FASKES_STYLE=Object.fromEntries(FASKES_TYPES.map(t=>[t.key,t]));
+function faskesIcon(t){return L.divIcon({className:'fmk-wrap',iconSize:[16,16],iconAnchor:[8,8],html:`<span class="fmk" style="background:${t.color}">${t.mk}</span>`});}
+function renderFaskes(arr){
+  if(faskesCtrl){faskesCtrl.remove();faskesCtrl=null;}
+  Object.values(faskesGroups).forEach(g=>map.removeLayer(g)); faskesGroups={};
+  const counts={}; FASKES_TYPES.forEach(t=>{faskesGroups[t.key]=L.layerGroup();counts[t.key]=0;});
+  arr.forEach(f=>{const t=FASKES_STYLE[f.lv];if(!t)return;
+    const m=L.marker([f.la,f.lo],{icon:faskesIcon(t),keyboard:false});
+    m.bindTooltip(`<b>${f.n}</b><br>${t.label}${f.kp?' · '+f.kp:''}${f.kecName?'<br>Kec. '+f.kecName:''}`,{className:'tbtip',direction:'top'});
+    m.addTo(faskesGroups[f.lv]);counts[f.lv]++;});
+  faskesActive.forEach(k=>{ if(faskesGroups[k]&&counts[k]) faskesGroups[k].addTo(map); });
+  const ctrl=L.control({position:'topright'});
+  ctrl.onAdd=function(){
+    const div=L.DomUtil.create('div','faskes-ctrl');
+    L.DomEvent.disableClickPropagation(div);L.DomEvent.disableScrollPropagation(div);
+    let rows=`<div class="fc-head"><b>Titik Faskes</b> <span>${arr.length}</span></div>`;
+    FASKES_TYPES.forEach(t=>{if(!counts[t.key])return; const on=faskesActive.has(t.key)?' checked':'';
+      rows+=`<label class="fc-row"><input type="checkbox" data-k="${t.key}"${on}><span class="fmk sm" style="background:${t.color}">${t.mk}</span><span class="fc-lab">${t.label}</span><span class="fc-n">${counts[t.key]}</span></label>`;});
+    rows+=`<div class="fc-foot"><a href="#" class="fc-all" data-v="1">semua</a> · <a href="#" class="fc-all" data-v="0">kosong</a></div>`;
+    div.innerHTML=rows;
+    const setg=(k,on)=>{const g=faskesGroups[k]; if(on){faskesActive.add(k);g.addTo(map);}else{faskesActive.delete(k);map.removeLayer(g);}};
+    div.querySelectorAll('input[type=checkbox]').forEach(cb=>{cb.onchange=()=>setg(cb.dataset.k,cb.checked);});
+    div.querySelectorAll('.fc-all').forEach(a=>{a.onclick=e=>{e.preventDefault();const on=a.dataset.v==='1';
+      div.querySelectorAll('input[type=checkbox]').forEach(cb=>{cb.checked=on;setg(cb.dataset.k,on);});};});
+    return div;};
+  faskesCtrl=ctrl; ctrl.addTo(map);
+}
+
+/* ---------- agregasi & util ---------- */
+function val(r){
+  if(!r) return null;
+  if(metric==='kasus') return r.kasus;
+  if(metric==='rate') return r.rate;
+  if(metric==='keberhasilan') return r.kasus? +(100*r.berhasil/r.kasus).toFixed(1):null;
+  if(metric==='ikpct') return r.kasus? +(100*r.ik/r.kasus).toFixed(1):null;
+  if(metric==='belumik') return r.kasus? +(100*(r.kasus-r.ik)/r.kasus).toFixed(1):null;
+  if(metric==='tpt') return r.tpt!=null? r.tpt : null;
+}
+function kecAgg(y){
+  const per=DATA.peta[y]||{}, out={};
+  DATA.kelurahan.forEach(k=>{const nk=norm(k.kec), r=per[k.kel]||{};
+    const o=out[nk]||(out[nk]={kasus:0,berhasil:0,ik:0,tpt:0,pop:0});
+    o.kasus+=r.kasus||0;o.berhasil+=r.berhasil||0;o.ik+=r.ik||0;o.tpt+=r.tpt||0;o.pop+=k.pop||0;});
+  Object.values(out).forEach(o=>o.rate=o.pop?+(o.kasus/o.pop*100000).toFixed(1):null);
+  return out;
+}
+function units(){
+  const m=mode(), per=DATA.peta[year]||{};
+  if(m==='kotakec'){ const a=kecAgg(year); return GEO_KEC.features.map(f=>({name:f.properties.KEC,rec:a[norm(f.properties.KEC)]})); }
+  if(m==='kotakel'){ return DATA.kelurahan.map(k=>({name:k.desa,rec:per[k.kel]})); }
+  return DATA.kelurahan.filter(k=>norm(k.kec)===selKec).map(k=>({name:k.desa,rec:per[k.kel]}));
+}
+function breaks(vals){
+  const v=vals.filter(x=>x!=null&&x>0).sort((a,b)=>a-b);
+  if(!v.length) return [0];
+  return [1,2,3,4,5,6].map(i=>v[Math.floor(i/7*v.length)]).filter((x,i,a)=>a.indexOf(x)===i);
+}
+function color(x,br,ramp){ if(x==null) return '#f0f0f0'; let i=0; while(i<br.length&&x>=br[i])i++; return ramp[Math.min(i+1,ramp.length-1)]; }
+function legend(br,ramp){
+  if(legendCtl) legendCtl.remove();
+  legendCtl=L.control({position:'bottomright'});
+  legendCtl.onAdd=()=>{const d=L.DomUtil.create('div','legend');
+    d.innerHTML=`<b>${LAB[metric]}</b><br>`+br.map((b,i)=>`<i style="background:${ramp[i+1]}"></i>≥ ${fmt(b)}`).join('<br>')+`<br><i style="background:#f0f0f0"></i>tak ada`;
+    return d;};
+  legendCtl.addTo(map);
+}
+
+/* ---------- gambar peta ---------- */
+function drawKel(per,ramp,onlyKec){
+  const pool = onlyKec? DATA.kelurahan.filter(k=>norm(k.kec)===onlyKec) : DATA.kelurahan;
+  const br=breaks(pool.map(k=>val(per[k.kel])));
+  layer=L.geoJSON(GEO_KEL,{style:f=>{
+      const inScope = !onlyKec || norm(f.properties.KECAMATAN)===onlyKec;
+      if(!inScope) return {fillColor:'#ffffff',weight:.4,color:'#e2e1dd',fillOpacity:.55};
+      return {fillColor:color(val(per[norm(f.properties.DESA)]),br,ramp),weight:.7,color:'#fff',fillOpacity:.85};},
+    onEachFeature:(f,l)=>{
+      if(onlyKec && norm(f.properties.KECAMATAN)!==onlyKec) return;
+      const nk=norm(f.properties.DESA), rec=per[nk]||{}, m=master[nk]||{};
+      l.bindTooltip(`<b>${f.properties.DESA}</b><br>Kec. ${f.properties.KECAMATAN}<br>Penduduk: ${fmt(m.pop)}<br>Kasus: ${fmt(rec.kasus||0)} · rate ${fmt(rec.rate)}<br>Sembuh: ${rec.kasus?(100*rec.berhasil/rec.kasus).toFixed(0):'–'}% · IK: ${rec.kasus?(100*rec.ik/rec.kasus).toFixed(0):'–'}%`,{sticky:true});
+      l.on({mouseover:e=>{ if(e.target!==selLayer) e.target.setStyle({weight:2,color:'#0F2E4E'}); },
+            mouseout:e=>{ if(e.target!==selLayer) layer.resetStyle(e.target); },
+            click:e=>{ L.DomEvent.stopPropagation(e); selKel=nk; if(selLayer&&selLayer!==e.target) layer.resetStyle(selLayer); selLayer=e.target; e.target.setStyle({weight:3,color:'#0F2E4E'}); showDetail(nk); }});
+    }}).addTo(map);
+  legend(br,ramp);
+  selLayer=null;
+  if(selKel){ layer.eachLayer(l=>{ if(l.feature&&norm(l.feature.properties.DESA)===selKel){ selLayer=l; l.setStyle({weight:3,color:'#0F2E4E'}); }});
+    if(document.getElementById('detailPanel').style.display!=='none') showDetail(selKel); }
+}
+function draw(){
+  const ramp=RAMPS[metric], m=mode();
+  if(layer) layer.remove();
+  if(m==='kotakec'){
+    const agg=kecAgg(year), br=breaks(Object.values(agg).map(val));
+    layer=L.geoJSON(GEO_KEC,{style:f=>({fillColor:color(val(agg[norm(f.properties.KEC)]),br,ramp),weight:1,color:'#fff',fillOpacity:.85}),
+      onEachFeature:(f,l)=>{const nk=norm(f.properties.KEC), r=agg[nk]||{};
+        l.bindTooltip(`<b>${f.properties.KEC}</b><br>Kasus ${fmt(r.kasus)} · rate ${fmt(r.rate)}<br>Sembuh ${r.kasus?(100*r.berhasil/r.kasus).toFixed(0):'–'}% · IK ${r.kasus?(100*r.ik/r.kasus).toFixed(0):'–'}%<br><span style="opacity:.7">klik untuk pilih kecamatan</span>`,{sticky:true});
+        l.on({mouseover:e=>{ if(e.target!==pickLayer) e.target.setStyle({weight:2.5,color:'#0F2E4E'}); },
+              mouseout:e=>{ if(e.target!==pickLayer) layer.resetStyle(e.target); },
+              click:e=>setPick(nk,e.target)});
+      }}).addTo(map);
+    legend(br,ramp);
+    pickLayer=null;
+    if(pickedKec){ layer.eachLayer(l=>{ if(l.feature&&norm(l.feature.properties.KEC)===pickedKec){ pickLayer=l; l.setStyle({weight:3,color:'#0F2E4E'}); }}); }
+  } else if(m==='kotakel'){
+    drawKel(DATA.peta[year]||{}, ramp, null);
+  } else {
+    drawKel(DATA.peta[year]||{}, ramp, selKec);
+  }
+  drawLabels(); drawTop(); kpis(); crumb(); trend(); drawFaskesPanel(); drawProcess();
+}
+function drawLabels(){
+  labelLayer.clearLayers();
+  if(!showNum){ labelLayer.remove(); return; }
+  const m=mode(), per=DATA.peta[year]||{};
+  if(m==='kotakec'){ const a=kecAgg(year);
+    GEO_KEC.features.forEach(f=>{const nk=norm(f.properties.KEC), v=val(a[nk]), c=kecCentroid[nk];
+      if(v!=null&&c) labelLayer.addLayer(L.marker(c,{interactive:false,icon:L.divIcon({className:'lbl',html:fmt(v),iconSize:null})}));});
+  } else {
+    const pool = m==='kotakel'? DATA.kelurahan : DATA.kelurahan.filter(k=>norm(k.kec)===selKec);
+    pool.forEach(k=>{const v=val(per[k.kel]), c=kelCentroid[k.kel];
+      if(v!=null&&c) labelLayer.addLayer(L.marker(c,{interactive:false,icon:L.divIcon({className:'lbl',html:fmt(v),iconSize:null})}));});
+  }
+  labelLayer.addTo(map);
+}
+function drawTop(){
+  const f=FOCUS(), per=DATA.peta[year]||{};
+  let list, unit;
+  if(f){ list=DATA.kelurahan.filter(k=>norm(k.kec)===f).map(k=>({d:k.desa,v:val(per[k.kel])})); unit='Kelurahan'; }
+  else { list=units().map(u=>({d:u.name,v:val(u.rec)})); unit=mode()==='kotakec'?'Kecamatan':'Kelurahan'; }
+  const rows=list.filter(r=>r.v!=null).sort((a,b)=>b.v-a.v).slice(0,15);
+  const mx=rows[0]?.v||1, ramp=RAMPS[metric];
+  document.getElementById('topHead').textContent=unit+' teratas';
+  document.getElementById('top').innerHTML=rows.map(r=>
+    `<div style="display:flex;align-items:center;gap:6px;font-size:.75rem;margin:2px 0">
+       <span style="flex:0 0 150px;color:#52514e;line-height:1.15">${r.d}</span>
+       <span style="flex:1;background:#eef3fb;border-radius:4px"><span style="display:block;height:11px;background:${ramp[5]};border-radius:4px;width:${100*r.v/mx}%"></span></span>
+       <b style="flex:0 0 42px;text-align:right">${fmt(r.v)}</b></div>`).join('');
+}
+function kpis(){
+  const f=FOCUS(), per=DATA.peta[year]||{}, pd=year==='semua'?'2021–2026':year;
+  let kasus=0,berhasil=0,ik=0,scope,unit,top;
+  if(f){
+    const kel=DATA.kelurahan.filter(k=>norm(k.kec)===f);
+    kel.forEach(k=>{const r=per[k.kel]||{};kasus+=r.kasus||0;berhasil+=r.berhasil||0;ik+=r.ik||0;});
+    top=kel.map(k=>({d:k.desa,v:(per[k.kel]||{}).kasus||0})).sort((a,b)=>b.v-a.v)[0];
+    scope=(kecName[f]||f)+' · '+pd; unit='Kelurahan';
+  } else {
+    const us=units(); us.forEach(u=>{const r=u.rec||{};kasus+=r.kasus||0;berhasil+=r.berhasil||0;ik+=r.ik||0;});
+    top=us.filter(u=>u.rec).map(u=>({d:u.name,v:u.rec.kasus||0})).sort((a,b)=>b.v-a.v)[0];
+    scope='Kota Bandung · '+pd; unit=mode()==='kotakec'?'Kecamatan':'Kelurahan';
+  }
+  document.getElementById('kpis').innerHTML=[
+    ['Kasus TBC',fmt(kasus),scope],
+    ['Kesembuhan',(kasus?(100*berhasil/kasus).toFixed(0):'–')+'%','sembuh + lengkap'],
+    ['IK dilakukan',(kasus?(100*ik/kasus).toFixed(0):'–')+'%','pasien sbg kasus indeks'],
+    [unit+' tertinggi',top?top.d:'–',top?fmt(top.v)+' kasus':'']
+  ].map(k=>`<div class="kpi"><b>${k[1]}</b><span>${k[0]} · ${k[2]}</span></div>`).join('');
+}
+function crumb(){
+  const c=document.getElementById('crumb'), m=mode();
+  if(m==='drill') c.innerHTML=`Kota Bandung › <b>${kecName[selKec]||selKec}</b> · klik kelurahan untuk detail`;
+  else if(m==='kotakel') c.innerHTML='<b>Kota Bandung</b> (151 kelurahan) · klik kelurahan untuk detail';
+  else if(pickedKec) c.innerHTML=`<b>Kota Bandung</b> › ${kecName[pickedKec]||pickedKec} (dipilih) · tekan <b>Drill down</b> untuk peta kelurahan`;
+  else c.innerHTML='<b>Kota Bandung</b> (30 kecamatan) · klik kecamatan untuk memilih';
+}
+
+/* ---------- pilih / drill ---------- */
+function setPick(nk, lyr){
+  pickedKec = nk||null;
+  document.getElementById('kecSel').value = pickedKec||'';
+  if(pickLayer){ layer.resetStyle(pickLayer); pickLayer=null; }
+  if(pickedKec){
+    if(lyr) pickLayer=lyr; else layer.eachLayer(l=>{ if(l.feature&&norm(l.feature.properties.KEC)===pickedKec) pickLayer=l; });
+    if(pickLayer) pickLayer.setStyle({weight:3,color:'#0F2E4E'});
+  }
+  const db=document.getElementById('drillBtn'); db.textContent='Drill down ke kelurahan ▾'; db.style.display = pickedKec? '' : 'none';
+  kpis(); trend(); crumb(); drawTop(); drawFaskesPanel(); drawProcess();   // ubah statistik, top-list, peringkat faskes, aliran, proses — TANPA ganti peta
+}
+function drillTo(nk){
+  level='kec'; selKec=nk; pickedKec=nk; selKel=null;
+  document.getElementById('kecSel').value=nk;
+  const db=document.getElementById('drillBtn'); db.textContent='Drill up ke Kota ▴'; db.style.display='';
+  closeDetailPanel(); draw();
+  renderFaskes(FASKB.filter(f=>f.kec===nk));
+  if(kecBounds[nk]) map.fitBounds(kecBounds[nk],{padding:[20,20]});
+}
+function backToKota(){
+  level='kota'; selKec=null; selKel=null; selLayer=null; pickedKec=null; pickLayer=null;
+  document.getElementById('kecSel').value='';
+  document.getElementById('drillBtn').style.display='none';
+  closeDetailPanel(); draw();
+  renderFaskes(FASKB);
+  viewKota();
+}
+
+/* ---------- detail kelurahan ---------- */
+function showDetail(nk){
+  const m=master[nk]||{}, per=DATA.peta[year]||{}, r=per[nk]||{kasus:0,berhasil:0,ik:0,tpt:0,rate:null};
+  const pct=(a,b)=>b?Math.round(100*a/b)+'%':'–';
+  document.getElementById('cityWrap').style.display='none';
+  const d=document.getElementById('detailPanel'); d.style.display='';
+  const bar=(lbl,v,mx,col)=>`<div style="display:flex;align-items:center;gap:6px;font-size:.75rem;margin:3px 0"><span style="flex:0 0 92px;color:#52514e">${lbl}</span><span style="flex:1;background:#eef3fb;border-radius:4px"><span style="display:block;height:12px;background:${col};border-radius:4px;width:${mx?100*v/mx:0}%"></span></span><b style="flex:0 0 46px;text-align:right">${fmt(v)}</b></div>`;
+  const rwHtml=()=>{
+    const rl=(RWDATA&&RWDATA.rw[year]&&RWDATA.rw[year][nk])?RWDATA.rw[year][nk]:[];
+    if(!rl.length) return '<div style="font-size:.72rem;color:var(--mut);margin-top:12px">RW tak teruraikan dari alamat untuk kelurahan ini pada periode terpilih.</div>';
+    const fallback = metric==='rate';   // rate tak tersedia per RW (tanpa populasi RW)
+    const rwv=r=>{ const ks=r[1],bh=r[2],ic=r[3],tp=r[4]||0;
+      if(fallback||metric==='kasus') return ks;
+      if(metric==='keberhasilan') return ks?100*bh/ks:null;
+      if(metric==='ikpct') return ks?100*ic/ks:null;
+      if(metric==='belumik') return ks?100*(ks-ic)/ks:null;
+      if(metric==='tpt') return tp; return ks; };
+    const isPct = ['keberhasilan','ikpct','belumik'].includes(metric)&&!fallback;
+    const ramp=RAMPS[metric];   // warna ikut metrik aktif (rate pakai ramp rate walau nilai = kasus)
+    const rows=rl.map(r=>({r,v:rwv(r)})).filter(x=>x.v!=null).sort((a,b)=>b.v-a.v).slice(0,8);
+    const mx=rows[0]?.v||1, lbl=fallback?'Kasus (rate tak tersedia per RW)':LAB[metric];
+    return `<div style="font-weight:700;color:var(--navy);margin:12px 0 4px;font-size:.85rem">RW hotspot dalam kelurahan `+
+      `<span style="font-weight:400;color:var(--mut);font-size:.7rem">· ${lbl} · dari alamat ~70%</span></div>`+
+      rows.map(x=>{const r=x.r, ks=r[1], disp=isPct?x.v.toFixed(0)+'%':fmt(Math.round(x.v));
+        return `<div style="display:flex;align-items:center;gap:6px;font-size:.73rem;margin:2px 0">`+
+          `<span style="flex:0 0 52px;color:#52514e">${r[0]}</span>`+
+          `<span style="flex:1;background:#eef3fb;border-radius:4px"><span style="display:block;height:10px;background:${ramp[5]};border-radius:4px;width:${mx?100*x.v/mx:0}%"></span></span>`+
+          `<b style="flex:0 0 42px;text-align:right">${disp}</b><span style="flex:0 0 78px;text-align:right;color:var(--mut);font-size:.64rem">${fmt(ks)} kasus</span></div>`;}).join('');
+  };
+  d.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:start;gap:8px">
+      <div><div style="font-weight:800;color:var(--navy);font-size:1.05rem">${m.desa||nk}</div>
+        <div style="font-size:.75rem;color:var(--mut)">Kec. ${m.kec||'–'} · penduduk ${fmt(m.pop)} · ${year==='semua'?'2021–2026':'tahun '+year}</div></div>
+      <button id="detClose" style="border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 10px;cursor:pointer;font-size:.78rem;white-space:nowrap">← Tutup</button>
+    </div>
+    <div class="kpis" style="grid-template-columns:repeat(2,1fr);margin:10px 0">
+      <div class="kpi"><b>${fmt(r.kasus)}</b><span>Kasus · rate ${fmt(r.rate)}/100k</span></div>
+      <div class="kpi"><b>${pct(r.berhasil,r.kasus)}</b><span>Kesembuhan</span></div>
+      <div class="kpi"><b>${pct(r.ik,r.kasus)}</b><span>IK dilakukan</span></div>
+      <div class="kpi"><b>${fmt(r.tpt)}</b><span>Penerima TPT (kontak)</span></div>
+    </div>
+    <div style="font-weight:700;color:var(--navy);margin:4px 0 2px;font-size:.85rem">Kaskade kelurahan</div>
+    ${bar('Kasus',r.kasus,r.kasus,'#2A78D6')}${bar('Sembuh',r.berhasil,r.kasus,'#1baf7a')}${bar('IK dilakukan',r.ik,r.kasus,'#eda100')}
+    <div style="font-weight:700;color:var(--navy);margin:10px 0 2px;font-size:.85rem">Kasus &amp; sembuh per tahun</div>
+    <div id="detTrend" style="height:190px"></div>
+    ${rwHtml()}`;
+  document.getElementById('detClose').onclick=closeKelDetail;
+  const yrs=DATA.tahun, get=(y,fld)=>(DATA.peta[String(y)][nk]||{})[fld]||0;
+  chart('detTrend').setOption({tooltip:{trigger:'axis'},legend:{data:['Kasus','Sembuh'],top:0,textStyle:{fontSize:10}},
+    grid:{left:38,right:10,top:24,bottom:20},xAxis:{type:'category',data:yrs},yAxis:{type:'value'},
+    series:[{name:'Kasus',type:'bar',data:yrs.map(y=>get(y,'kasus')),itemStyle:{color:'#2A78D6'}},
+            {name:'Sembuh',type:'bar',data:yrs.map(y=>get(y,'berhasil')),itemStyle:{color:'#1baf7a'}}]});
+  drawProcess();   // proses & lag ikut kelurahan terpilih
+}
+function closeDetailPanel(){ document.getElementById('detailPanel').style.display='none'; document.getElementById('cityWrap').style.display='grid'; }
+function closeKelDetail(){ if(!selKel) return; selKel=null; if(selLayer){layer.resetStyle(selLayer);selLayer=null;} closeDetailPanel(); drawProcess(); }
+
+/* ---------- diagram alur (angka dinamis + lag jadi label panah) ---------- */
+function drawProcess(){
+  const P=DATA.proses, f=FOCUS();
+  let pr, wil;
+  if(selKel && P.kel[selKel]){ pr=P.kel[selKel][year]; const m=(DATA.kelurahan||[]).find(k=>norm(k.kelurahan)===selKel); wil='kelurahan '+((m&&m.kelurahan)||selKel); }
+  else if(f && P.kec[f]){ pr=P.kec[f][year]; wil='kecamatan '+(kecName[f]||f); }
+  else { pr=P.kota[year]; wil='Kota Bandung'; }
+  if(!pr) return;
+  document.getElementById('procYr').textContent='· '+(year==='semua'?'2021–2026':'tahun '+year)+' · '+wil;
+  const T=Object.fromEntries(pr.tahap.map(t=>[t.nama,t.n]));
+  const ik=pr.ik||{tahap:[],n_indeks:0}, I=Object.fromEntries((ik.tahap||[]).map(t=>[t.nama,t.n]));
+  const vals={terduga:T['Terduga'], diagnosis:T['Terdiagnosis TBC'], mulai:T['Mulai pengobatan'], berhasil:T['Berhasil'],  // 'Berhasil' = kunci data JSON (jangan diganti)
+    ik:ik.n_indeks, kontak:I['Total kontak'], invest:I['Diinvestigasi'], periksa:I['Diperiksa'],
+    sakit:I['Sakit TBC'], eligible:I['Eligible TPT'], penerima:I['Penerima TPT'], selesai:I['Selesai TPT']};
+  const dyn={'terduga-diagnosis':lagfmt(pr.lag[0]), 'diagnosis-mulai':lagfmt(pr.lag[1]), 'mulai-berhasil':lagfmt(pr.lag[2])};
+  drawAlur(vals, dyn);
+}
+function trend(){
+  const f=FOCUS(), ym=Object.keys(DATA.tren_kota).sort();
+  const src=f?((DATA.tren_kec||{})[f]||{}):DATA.tren_kota;
+  document.getElementById('trendHead').textContent=f?('Tren bulanan kecamatan · '+(kecName[f]||f)):'Tren bulanan kota';
+  const g=(m,fl)=>(src[m]||{})[fl]||0;
+  chart('trend').setOption({tooltip:{trigger:'axis'},legend:{data:['Kasus','Sembuh','IK'],top:0,textStyle:{fontSize:11}},
+    grid:{left:44,right:12,top:28,bottom:24},xAxis:{type:'category',data:ym,axisLabel:{fontSize:9,interval:11}},yAxis:{type:'value'},
+    series:[
+      {name:'Kasus',type:'line',smooth:true,showSymbol:false,data:ym.map(m=>g(m,'kasus')),itemStyle:{color:'#2A78D6'}},
+      {name:'Sembuh',type:'line',smooth:true,showSymbol:false,data:ym.map(m=>g(m,'berhasil')),itemStyle:{color:'#1baf7a'}},
+      {name:'IK',type:'line',smooth:true,showSymbol:false,data:ym.map(m=>g(m,'ik')),itemStyle:{color:'#eda100'}}
+    ]});
+}
+
+/* ---------- analisis faskes ---------- */
+function drawFaskesPanel(){
+  if(!FDATA) return;
+  const f=FOCUS();
+  document.getElementById('fkCtx').textContent='· '+(f?(kecName[f]||f):'Kota Bandung')+' · '+(year==='semua'?'2021–2026':'tahun '+year);
+  let rk=(FDATA.peringkat[year]||[]).slice();
+  if(f) rk=rk.filter(r=>r.kec===f);
+  const top=rk.sort((a,b)=>b.kasus-a.kasus).slice(0,10), mx=top[0]?.kasus||1;
+  const jc={'Puskesmas':'#159e8f','Rumah Sakit':'#1d54a0','Klinik':'#e0710f'};
+  document.getElementById('fkRank').innerHTML = top.length? top.map((r,i)=>{
+    const bh=r.kasus?Math.round(100*r.berhasil/r.kasus):0, ikp=r.kasus?Math.round(100*r.ik/r.kasus):0, col=jc[r.jenis]||'#2A78D6';
+    return `<div class="frank"><div class="fn2">${i+1}. ${r.nama}${r.jenis?` · <span style="color:${col}">${r.jenis}</span>`:''}</div>
+       <div class="fr"><span class="fb"><span style="background:${col};width:${100*r.kasus/mx}%"></span></span>
+         <b class="fk">${fmt(r.kasus)}</b><span class="fp">✔${bh}% · IK ${ikp}%</span></div></div>`;}).join('')
+    : '<div style="font-size:.75rem;color:var(--mut)">tak ada data faskes</div>';
+  const il=FDATA.intra_luar[year]||{total:{},per_kec:{}};
+  let intra,luar,takp=0;
+  if(f){ const p=il.per_kec[f]||{intra:0,luar:0}; intra=p.intra; luar=p.luar; }
+  else { intra=il.total.intra||0; luar=il.total.luar||0; takp=il.total.takpetakan||0; }
+  chart('fkDonut').setOption({tooltip:{trigger:'item',formatter:'{b}: {c} ({d}%)'},legend:{bottom:0,textStyle:{fontSize:10}},
+    series:[{type:'pie',radius:['45%','70%'],center:['50%','44%'],label:{fontSize:10},
+      data:[{name:'Dalam kecamatan',value:intra,itemStyle:{color:'#1baf7a'}},
+            {name:'Luar kecamatan',value:luar,itemStyle:{color:'#e0710f'}},
+            ...(takp?[{name:'Tak terpetakan',value:takp,itemStyle:{color:'#c9c8c3'}}]:[])]}]});
+  drawFlow();
+}
+function drawFlow(){
+  if(!FDATA) return;
+  const f=FOCUS(), N=+document.getElementById('fkN').value;
+  document.getElementById('fkNv').textContent=N;
+  let al=(FDATA.alir[year]||[]).slice();
+  if(f) al=al.filter(p=>p.dom===f);
+  al=al.sort((a,b)=>b.kasus-a.kasus).slice(0,N);
+  const nm=nk=>kecName[nk]||nk, nodes={}, links=[];
+  al.forEach(p=>{const s=nm(p.dom)+'  (asal)', t=nm(p.fas)+'  (faskes)';
+    nodes[s]={name:s}; nodes[t]={name:t}; links.push({source:s,target:t,value:p.kasus});});
+  const c=chart('fkFlow');
+  if(!links.length){ c.clear(); return; }
+  const vals=links.map(l=>l.value), mxv=Math.max(...vals), mnv=Math.min(...vals);
+  links.forEach(l=>{ const t=(mxv>mnv)?(l.value-mnv)/(mxv-mnv):1;
+    l.lineStyle={color:RB[Math.min(RB.length-1,Math.floor(t*RB.length))],opacity:.62}; });
+  c.setOption({backgroundColor:'#fff',
+    tooltip:{trigger:'item',formatter:o=>o.dataType==='edge'?`${o.data.source} → ${o.data.target}<br><b>${fmt(o.data.value)}</b> kasus`:o.name},
+    series:[{type:'sankey',nodeAlign:'left',nodeGap:8,nodeWidth:12,emphasis:{focus:'adjacency'},left:6,right:132,top:6,bottom:6,
+      data:Object.values(nodes),links:links,label:{fontSize:10,color:'#333'},
+      lineStyle:{curveness:.5},itemStyle:{color:'#256abf',borderColor:'#256abf'}}]},true);
+}
+
+Promise.all([
+  fetch('data/cascade_spatial.json').then(r=>r.json()),
+  fetch('data/faskes_cascade.json').then(r=>r.json()),
+  fetch('data/rw_cascade.json').then(r=>r.json()),
+  fetch('data/geo/bandung_kelurahan.geojson').then(r=>r.json()),
+  fetch('data/geo/bandung_kecamatan.geojson').then(r=>r.json()),
+  fetch('data/geo/faskes_bandung.json').then(r=>r.json())
+]).then(([d,fd,rw,gkel,gkec,fkb])=>{
+  DATA=d; FDATA=fd; RWDATA=rw; GEO_KEL=gkel; GEO_KEC=gkec; FASKB=fkb; d.kelurahan.forEach(k=>master[k.kel]=k);
+  map=L.map('map',{scrollWheelZoom:true}).setView(CITY,12);
+  cityBounds=L.geoJSON(GEO_KEC).getBounds();
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap, © CARTO',maxZoom:18}).addTo(map);
+  map.on('click',()=>{ if(level==='kec') closeKelDetail(); });   // klik luar area kelurahan → kembali ke mode kecamatan
+  labelLayer=L.layerGroup();
+  GEO_KEL.features.forEach(f=>{kelCentroid[norm(f.properties.DESA)]=L.geoJSON(f).getBounds().getCenter();});
+  GEO_KEC.features.forEach(f=>{const nk=norm(f.properties.KEC), b=L.geoJSON(f).getBounds();
+    kecName[nk]=f.properties.KEC; kecCentroid[nk]=b.getCenter(); kecBounds[nk]=b;});
+  renderFaskes(FASKB);
+  const yrs=['semua',...d.tahun.map(String)];
+  document.getElementById('yrs').innerHTML=yrs.map(y=>`<button data-y="${y}" class="${y==='semua'?'on':''}">${y==='semua'?'Semua':y}</button>`).join('');
+  document.querySelectorAll('#yrs button').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#yrs button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); year=b.dataset.y; draw(); drawProcess();});
+  const opts=GEO_KEC.features.map(f=>({nk:norm(f.properties.KEC),nm:f.properties.KEC})).sort((a,b)=>a.nm.localeCompare(b.nm));
+  document.getElementById('kecSel').innerHTML='<option value="">Semua kecamatan (Kota Bandung)</option>'+opts.map(o=>`<option value="${o.nk}">${o.nm}</option>`).join('');
+  document.getElementById('kecSel').onchange=e=>{ const v=e.target.value; v?drillTo(v):backToKota(); };   // pilih kecamatan = langsung drill (spt tombol drill down)
+  document.getElementById('drillBtn').onclick=()=>{ if(level==='kec') backToKota(); else if(pickedKec) drillTo(pickedKec); };
+  document.getElementById('metric').onchange=e=>{metric=e.target.value; draw();};
+  document.getElementById('cityUnit').onchange=e=>{cityUnit=e.target.value; selKel=null; pickedKec=null; pickLayer=null; document.getElementById('drillBtn').style.display='none'; if(level==='kota') draw();};
+  document.getElementById('tNum').onchange=e=>{showNum=e.target.checked; drawLabels();};
+  document.getElementById('fkN').oninput=drawFlow;
+  draw(); trend(); drawProcess(); viewKota();
+});
 </script>
 </body>
 </html>

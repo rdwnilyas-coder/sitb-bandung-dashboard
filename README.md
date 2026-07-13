@@ -7,8 +7,8 @@ individu/PII; hanya angka agregat yang dibutuhkan untuk tampilan.
 Live: **https://rdwnilyas-coder.github.io/sitb-bandung-dashboard/**
 
 ## Halaman
-- `index.html` — landing + ringkasan kasus per tahun
-- `cascade_spatial.html` — dashboard utama (peta kaskade spasio-temporal, drill-down, faskes, tren)
+- `index.html` — **dashboard utama** (peta kaskade spasio-temporal, drill-down, faskes, tren) = root situs
+- `cascade_spatial.html` — salinan dashboard utama (untuk tautan langsung / balik dari alur)
 - `alur_proses.html` — diagram alur proses kaskade + Investigasi Kontak
 - `struktur.html` — pohon struktur data (kolom & missing value)
 
