@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Statistik Transisi State TB — Kota Bandung</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  :root{--navy:#0F2E4E;--blue:#2A78D6;--ink:#0b0b0b;--mut:#52514e;--line:#e2e1dd;--bg:#f7f7f5}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+  header{background:var(--navy);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px}
+  .brand-logo{background:#fff;border-radius:12px;padding:6px 12px;display:flex;align-items:center;min-width:66px;min-height:54px;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+  .brand-logo img{height:46px;width:auto;display:block}
+  header h1{margin:0;font-size:1.12rem} header p{margin:3px 0 0;font-size:.8rem;color:#9ab6e0}
+  header a{color:#bfe0ff}
+  .hnav{margin-left:auto;display:flex;flex-direction:column;gap:3px;font-size:.8rem;text-align:right}
+  .hnav a{color:#bfe0ff;white-space:nowrap}
+  .wrap{max-width:1180px;margin:0 auto;padding:14px 16px}
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:12px}
+  select{padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:.85rem}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:.74rem;color:var(--mut);align-items:center}
+  .legend b{color:var(--navy)}
+  .lg-box{display:inline-block;width:16px;height:12px;border:1.5px solid var(--navy);background:#2A78D622;vertical-align:-1px;margin-right:4px}
+  .lg-med{display:inline-block;width:16px;border-top:2px solid var(--navy);vertical-align:3px;margin-right:4px}
+  .lg-mean{color:#c0392b;font-size:1rem;vertical-align:-1px}
+  h3{color:var(--navy);margin:2px 0 8px;font-size:1rem}
+  h3 span{font-weight:400;color:var(--mut);font-size:.8rem}
+  .miniwrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:2px 0 12px}
+  .miniflow{height:60px;width:auto;max-width:100%}
+  .unit{font-size:.73rem;color:var(--mut)} .unit b{color:var(--navy)}
+  .basis{font-size:.73rem;color:var(--mut);margin:0 0 10px} .basis b{color:var(--navy)}
+  code{background:#eef1f5;padding:1px 5px;border-radius:4px;font-size:.86em;color:#0F2E4E;font-family:ui-monospace,Menlo,monospace}
+  .chartrow{display:grid;grid-template-columns:1fr;gap:10px}
+  .chartrow.two{grid-template-columns:1.55fr 1fr} @media(max-width:820px){.chartrow.two{grid-template-columns:1fr}}
+  .echart{height:300px;width:100%}
+  .tblwrap{overflow-x:auto;margin-top:8px}
+  table{border-collapse:collapse;width:100%;font-size:.75rem;white-space:nowrap}
+  th,td{border:1px solid var(--line);padding:4px 8px;text-align:right}
+  th{background:#f2f2f2;color:var(--navy);position:sticky;top:0}
+  td.cat,th.cat{text-align:left;position:sticky;left:0;background:#fff;font-weight:600;max-width:220px;white-space:normal}
+  th.cat{background:#f2f2f2}
+  .foot{font-size:.7rem;color:var(--mut);line-height:1.5;margin-top:8px}
+  .keypts{margin-top:10px;background:#f6f9fd;border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:8px;padding:8px 12px}
+  .keypts .kp-h{font-weight:700;color:var(--navy);font-size:.82rem;margin-bottom:2px}
+  .keypts ul{margin:0;padding-left:18px} .keypts li{font-size:.78rem;color:#333;line-height:1.5;margin:3px 0}
+  .keypts b{color:var(--navy)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand-logo"><img src="logo_unpad.png" alt="Universitas Padjadjaran" onerror="this.style.display='none';this.nextElementSibling.hidden=false"><span class="logo-fb" hidden>UNPAD</span></div>
+  <div>
+    <h1>Statistik Deskriptif Durasi Transisi State TB</h1>
+    <p>Ukuran sentral & sebaran waktu antar tahap · Kota Bandung · SITB 2021–2026</p>
+  </div>
+  <nav class="hnav"><a href="statistik_ik.html">Statistik investigasi kontak →</a><a href="index.html">← Dashboard</a></nav>
+</header>
+<div class="wrap">
+  <div class="controls">
+    <label>Rincian (breakdown):
+      <select id="dim">
+        <option value="keseluruhan">Keseluruhan Kota Bandung</option>
+        <option value="tahun">Per tahun</option>
+        <option value="kecamatan">Per kecamatan (domisili)</option>
+        <option value="faskes">Per faskes (n≥30)</option>
+      </select></label>
+    <span id="dimNote" style="font-size:.78rem;color:var(--mut)"></span>
+  </div>
+
+  <div class="panel">
+    <div class="legend">
+      <span><b>Boxplot (candle):</b></span>
+      <span><i class="lg-box"></i>kotak = Q1–Q3 (IQR)</span>
+      <span><i class="lg-med"></i>garis = median</span>
+      <span><span class="lg-mean">◆</span> = mean</span>
+      <span>whisker = batas 1,5·IQR</span>
+      <span><b>skew</b> &gt;0 = ekor kanan panjang (mean&gt;median)</span>
+      <span><b>CV</b> = SD/mean (sebaran relatif)</span>
+      <span>hover chart / baris tabel utk semua ukuran</span>
+    </div>
+  </div>
+
+  <div id="sections"></div>
+
+  <div class="panel foot" id="foot"></div>
+</div>
+<script>
+const fmt=n=>n==null?'–':(+n).toLocaleString('id-ID');
+const COLS=[["n","n"],["mean","mean"],["median","median"],["modus","modus"],["sd","SD"],["var","varians"],
+  ["min","min"],["max","maks"],["range","range"],["q1","Q1"],["q3","Q3"],["iqr","IQR"],["cv","CV"],["skew","skew"]];
+let DATA, charts={};
+
+// potongan diagram proses (gaya sama spt alur di dashboard) — sorot transisi yang diukur
+const FLOW=[{lab:'Terduga'},{lab:'Terdiagnosis'},{lab:'Mulai obat'},{lab:'Sembuh'}];
+const SEG={t1:0,t2:1,t3:2,t4:2}, TAG={t3:'SO',t4:'RO'};
+function miniFlow(t){
+  const W=112,H=34,G=124,y=13,cy=y+H/2,seg=SEG[t.key],X=i=>i*(W+G);
+  let s=`<svg viewBox="0 0 ${4*W+3*G} 62" class="miniflow" role="img" aria-label="posisi transisi ${t.label} dalam alur proses">`;
+  s+=`<defs><marker id="ma_${t.key}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="${t.warna}"/></marker>`+
+     `<marker id="mg_${t.key}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0L10,5L0,10z" fill="#cfcfc9"/></marker></defs>`;
+  for(let i=0;i<3;i++){ const x1=X(i)+W,x2=X(i+1),on=i===seg;
+    s+=`<line x1="${x1}" y1="${cy}" x2="${x2-2}" y2="${cy}" stroke="${on?t.warna:'#d6d6d1'}" stroke-width="${on?2.6:1.4}" marker-end="url(#${on?'ma':'mg'}_${t.key})"/>`;
+    if(on) s+=`<text x="${(x1+x2)/2}" y="${cy-6}" text-anchor="middle" font-size="9.5" font-weight="700" fill="${t.warna}">diukur (hari)${TAG[t.key]?' · '+TAG[t.key]:''}</text>`;
+  }
+  FLOW.forEach((n,i)=>{ const on=i===seg||i===seg+1;
+    s+=`<rect x="${X(i)}" y="${y}" width="${W}" height="${H}" rx="8" fill="${on?'#eaf2fb':'#f4f4f2'}" stroke="${on?'#2A78D6':'#dddad4'}" stroke-width="${on?1.8:1}"/>`+
+       `<text x="${X(i)+W/2}" y="${cy+3.5}" text-anchor="middle" font-size="11" font-weight="${on?700:400}" fill="${on?'#0F2E4E':'#aeaea8'}">${n.lab}</text>`;
+  });
+  return s+`</svg>`;
+}
+
+function nameOf(dim,id){ return dim==='kecamatan'?(DATA.kecName[id]||id) : dim==='keseluruhan'?'Kota Bandung' : id; }
+function catsFor(dim,tkey){
+  const S=DATA.stats[dim]||{};
+  let arr=Object.keys(S).filter(id=>S[id][tkey]).map(id=>({id,name:nameOf(dim,id),st:S[id][tkey]}));
+  if(dim==='tahun') arr.sort((a,b)=>a.id.localeCompare(b.id));
+  else if(dim!=='keseluruhan') arr.sort((a,b)=>b.st.median-a.st.median);
+  return arr;
+}
+function boxOption(t,arr,dim){
+  const many=arr.length>8;
+  return {
+    grid:{left:48,right:14,top:16,bottom:many?70:40},
+    tooltip:{trigger:'item',confine:true,formatter:p=>{
+      const c=arr[p.dataIndex]; if(!c) return ''; const s=c.st;
+      return `<b>${c.name}</b><br>n=${fmt(s.n)}<br>mean ${fmt(s.mean)} · median ${fmt(s.median)} · modus ${fmt(s.modus)} (×${fmt(s.modus_freq)})<br>`+
+        `SD ${fmt(s.sd)} · IQR ${fmt(s.iqr)} (Q1 ${fmt(s.q1)}–Q3 ${fmt(s.q3)})<br>min ${fmt(s.min)} · maks ${fmt(s.max)} · CV ${fmt(s.cv)} · skew ${fmt(s.skew)}<br>outlier ${fmt(s.n_outlier)}`;
+    }},
+    xAxis:{type:'category',data:arr.map(c=>c.name),axisLabel:{interval:0,rotate:dim==='keseluruhan'?0:38,fontSize:10,
+      formatter:v=>v.length>16?v.slice(0,16)+'…':v}},
+    yAxis:{type:'value',name:'hari',nameTextStyle:{fontSize:10}},
+    dataZoom: many?[{type:'slider',height:14,bottom:6},{type:'inside'}]:[],
+    series:[
+      {type:'boxplot',data:arr.map(c=>[c.st.wlo,c.st.q1,c.st.median,c.st.q3,c.st.whi]),
+        itemStyle:{color:t.warna+'22',borderColor:t.warna,borderWidth:1.4}},
+      {type:'scatter',name:'mean',symbol:'diamond',symbolSize:9,data:arr.map((c,i)=>[i,c.st.mean]),
+        itemStyle:{color:'#c0392b'},z:5,tooltip:{show:false}}
+    ]
+  };
+}
+function histOption(t){
+  const h=(DATA.hist[t.key]||{}).ALL||[];
+  return {grid:{left:44,right:10,top:16,bottom:34},
+    tooltip:{trigger:'axis',confine:true,formatter:p=>{const b=h[p[0].dataIndex];return `${b.x0}–${b.x1} hari<br>${fmt(b.c)} kasus`;}},
+    xAxis:{type:'category',data:h.map(b=>b.x0),axisLabel:{fontSize:9,interval:Math.ceil(h.length/8)},name:'hari',nameTextStyle:{fontSize:10},nameLocation:'end'},
+    yAxis:{type:'value',axisLabel:{fontSize:9}},
+    series:[{type:'bar',data:h.map(b=>b.c),itemStyle:{color:t.warna+'cc'},barCategoryGap:'8%'}]};
+}
+function tableHtml(t,arr,dim){
+  const head=`<tr><th class="cat">${dim==='keseluruhan'?'Wilayah':(dim==='tahun'?'Tahun':(dim==='kecamatan'?'Kecamatan':'Faskes'))}</th>`+
+    COLS.map(c=>`<th>${c[1]}</th>`).join('')+`</tr>`;
+  const rows=arr.map(c=>`<tr><td class="cat">${c.name}</td>`+COLS.map(cc=>{
+    let v=c.st[cc[0]]; if(cc[0]==='modus') return `<td>${fmt(v)} <span style="color:#9aa">×${fmt(c.st.modus_freq)}</span></td>`;
+    return `<td>${fmt(v)}</td>`;}).join('')+`</tr>`).join('');
+  return `<table>${head}${rows}</table>`;
+}
+function keyPoints(t, dim, arr){
+  const s=(DATA.stats.keseluruhan.ALL||{})[t.key]; if(!s) return '';
+  const neg=(DATA.meta.dibuang[t.key]||{}).negatif||0, bulan=v=>(v/30.44).toFixed(1), P=[];
+  // 1) sentral + kemencengan
+  let c=`Median <b>${fmt(s.median)} hari</b> — separuh kasus selesai ≤ ${fmt(s.median)} hari; rata-rata ${fmt(s.mean)} hari`;
+  if(['t3','t4'].includes(t.key)) c+=` (≈ ${bulan(s.median)} bulan)`;
+  c+='. ';
+  if(s.skew!=null && s.skew>1) c+=`Rata-rata jauh di atas median → distribusi <b>mengekor ke kanan</b> (skew ${fmt(s.skew)}): minoritas kasus sangat lama menarik rata-rata ke atas.`;
+  else if(s.skew!=null && Math.abs(s.skew)<=0.5) c+=`Distribusi hampir simetris (skew ${fmt(s.skew)}) — mean ≈ median.`;
+  else if(s.skew!=null) c+=`Distribusi agak <b>mengekor ke kanan</b> (skew ${fmt(s.skew)}).`;
+  P.push(c);
+  // 2) sebaran
+  let d=`Separuh kasus tengah (IQR) berdurasi <b>${fmt(s.q1)}–${fmt(s.q3)} hari</b> (lebar ${fmt(s.iqr)} hari); simpangan baku ${fmt(s.sd)} hari`;
+  if(s.cv!=null && s.cv>1) d+=` → sebaran sangat lebar relatif rata-rata (CV ${fmt(s.cv)}).`;
+  else if(s.cv!=null && s.cv<0.5) d+=` → durasi relatif seragam (CV ${fmt(s.cv)}).`;
+  else d+=` (CV ${fmt(s.cv)}).`;
+  P.push(d);
+  // 3) rentang & outlier
+  P.push(`Rentang ${fmt(s.min)}–${fmt(s.max)} hari; ${fmt(s.n_outlier)} nilai tergolong outlier (di luar 1,5·IQR).`);
+  // 4) perbandingan antar kategori (bila breakdown aktif)
+  if(dim!=='keseluruhan' && arr && arr.length>1){
+    const srt=[...arr].sort((a,b)=>b.st.median-a.st.median), hi=srt[0], lo=srt[srt.length-1];
+    const dl=dim==='tahun'?'tahun':(dim==='kecamatan'?'kecamatan':'faskes');
+    P.push(`Antar ${dl}: median tertinggi di <b>${hi.name}</b> (${fmt(hi.st.median)} hari), terendah di <b>${lo.name}</b> (${fmt(lo.st.median)} hari).`);
+  }
+  // 5) kualitas data
+  if(neg>0) P.push(`${fmt(neg)} rekaman berdurasi negatif (urutan tanggal terbalik) dibuang — lihat bukti kualitas data di bawah.`);
+  return `<div class="keypts"><div class="kp-h">Poin penting temuan</div><ul>${P.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+}
+function negHtml(){
+  const NC=DATA.negatif_contoh||{}, d=DATA.meta.dibuang;
+  const secs=DATA.transisi.filter(t=>d[t.key].negatif>0).map(t=>{
+    const list=NC[t.key]||[];
+    const rows=list.map(r=>`<tr><td>${r.thn??'–'}</td><td style="text-align:left">${r.awal}</td><td style="text-align:left">${r.akhir}</td>`+
+      `<td style="color:#c0392b;font-weight:700">${fmt(r.hari)}</td><td style="text-align:left">${r.faskes||'–'}</td></tr>`).join('');
+    return `<details style="margin-top:8px"><summary style="cursor:pointer;color:var(--navy);font-weight:600">${t.label} — ${fmt(d[t.key].negatif)} rekaman selisih negatif <span style="font-weight:400;color:var(--mut)">(contoh ${list.length} paling negatif)</span></summary>`+
+      `<div style="font-size:.72rem;color:var(--mut);margin:5px 0">Selisih hari = <code>${t.akhir}</code> − <code>${t.awal}</code> ⇒ negatif karena <code>${t.akhir}</code> lebih awal.</div>`+
+      `<div class="tblwrap"><table><tr><th>Tahun</th><th style="text-align:left">awal · <code>${t.awal}</code></th><th style="text-align:left">akhir · <code>${t.akhir}</code></th><th>Selisih (hari)</th><th style="text-align:left">Faskes</th></tr>${rows}</table></div></details>`;
+  }).join('');
+  return `<div style="margin-top:12px"><b>Bukti kualitas data — rekaman dengan selisih negatif</b> (tanggal akhir mendahului tanggal awal; anonim, tanpa nama/NIK/alamat pasien). Rekaman ini <b>dibuang</b> dari statistik:</div>${secs}`;
+}
+function render(){
+  const dim=document.getElementById('dim').value;
+  const keseluruhan=dim==='keseluruhan';
+  const host=document.getElementById('sections'); host.innerHTML='';
+  DATA.transisi.forEach(t=>{
+    const arr=catsFor(dim,t.key);
+    const sec=document.createElement('div'); sec.className='panel';
+    sec.innerHTML=`<h3>${t.label} <span>· sumber ${t.sumber}</span></h3>
+      <div class="miniwrap">${miniFlow(t)}<span class="unit">Satuan durasi = <b>hari</b> · <b>n</b> & modus-freq = jumlah kasus · <b>CV</b> & <b>skew</b> tanpa satuan</span></div>
+      <div class="basis">Dasar hitung: <b>selisih hari = akhir − awal</b> · awal = <code>${t.awal}</code> · akhir = <code>${t.akhir}</code> <span style="color:#c0392b">(negatif ⇒ tanggal <code>${t.akhir}</code> mendahului <code>${t.awal}</code>)</span></div>
+      <div class="chartrow ${keseluruhan?'two':''}">
+        <div class="echart" id="box_${t.key}"></div>
+        ${keseluruhan?`<div class="echart" id="hist_${t.key}"></div>`:''}
+      </div>
+      <div class="tblwrap">${arr.length?tableHtml(t,arr,dim):'<p style="font-size:.8rem;color:var(--mut)">Tak ada sel memenuhi ambang minimal.</p>'}</div>
+      ${keyPoints(t,dim,arr)}`;
+    host.appendChild(sec);
+    if(arr.length){ const bc=echarts.init(document.getElementById('box_'+t.key)); bc.setOption(boxOption(t,arr,dim)); charts['box_'+t.key]=bc; }
+    if(keseluruhan){ const hc=echarts.init(document.getElementById('hist_'+t.key)); hc.setOption(histOption(t)); charts['hist_'+t.key]=hc; }
+  });
+  const d=DATA.meta.dibuang;
+  document.getElementById('dimNote').textContent=
+    dim==='faskes'?`${Object.keys(DATA.stats.faskes).length} faskes (n≥${DATA.meta.min_sel.faskes}); ${DATA.meta.faskes_dibuang} faskes lain di bawah ambang`:
+    dim==='kecamatan'?`${Object.keys(DATA.stats.kecamatan).length}/30 kecamatan (sel n≥${DATA.meta.min_sel.kecamatan})`:'';
+  document.getElementById('foot').innerHTML=
+    `<b>Catatan.</b> Durasi = selisih tanggal antar tahap (hari). Difilter [${DATA.meta.filter}]. `+
+    `Selisih negatif dibuang (kesalahan urutan input tanggal): `+
+    DATA.transisi.map(t=>`${t.key.toUpperCase()} ${fmt(d[t.key].negatif)}`).join(' · ')+`. `+
+    `Boxplot: kotak Q1–Q3, garis median, ◆ mean, whisker 1,5·IQR; outlier tak digambar per-titik (jumlah di tooltip). `+
+    `Angka absolut n dipengaruhi truncation ekspor .xls; durasi per-rekaman tetap valid.`+
+    `T4 (RO, n≈${fmt((DATA.stats.keseluruhan.ALL.t4||{}).n)}) & sel kecil kecamatan/faskes: tafsir hati-hati. Modus durasi kontinu kurang bermakna → acuan utama median & IQR.`
+    + negHtml();
+}
+addEventListener('resize',()=>Object.values(charts).forEach(c=>c.resize()));
+document.getElementById('dim').onchange=render;
+fetch('data/lag_stats.json').then(r=>r.json()).then(d=>{DATA=d; render();})
+  .catch(e=>{document.getElementById('sections').innerHTML='<div class="panel">Gagal memuat data/lag_stats.json — jalankan analytics/agg_lag_stats.py lalu buka lewat server.</div>';});
+</script>
+</body>
+</html>

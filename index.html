@@ -13,6 +13,8 @@
   body{margin:0;font-family:system-ui,sans-serif;color:var(--ink);background:var(--bg)}
   header{background:var(--navy);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px}
   header h1{margin:0;font-size:1.15rem} header p{margin:3px 0 0;font-size:.8rem;color:#9ab6e0}
+  .hnav{margin-left:auto;display:flex;flex-direction:column;gap:4px;font-size:.82rem;text-align:right}
+  .hnav a{color:#bfe0ff;white-space:nowrap;font-weight:600}
   .brand-logo{background:#fff;border-radius:12px;padding:6px 12px;display:flex;align-items:center;justify-content:center;min-width:66px;min-height:54px;box-shadow:0 1px 4px rgba(0,0,0,.18);flex:0 0 auto}
   .brand-logo img{height:46px;width:auto;display:block}
   .logo-fb{color:var(--navy);font-weight:800;font-size:1.1rem;letter-spacing:.5px}
@@ -84,6 +86,10 @@
     <h1>Cascade Spasio-Temporal TBC — Kota Bandung</h1>
     <p>Kaskade pasien TBC · drill-down kecamatan → kelurahan · analisis faskes · SITB 2021–2026 · Penelitian Unpad</p>
   </div>
+  <nav class="hnav">
+    <a href="statistik_transisi.html">Statistik proses →</a>
+    <a href="statistik_ik.html">Statistik investigasi kontak →</a>
+  </nav>
 </header>
 <div class="wrap">
   <div class="kpis" id="kpis"></div>
