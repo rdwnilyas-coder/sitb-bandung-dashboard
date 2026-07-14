@@ -570,6 +570,7 @@ function drawPkDetail(){
   const f=(level==='kec')?selKec:null;
   let rk=(FDATA.peringkat[year]||[]).slice();
   if(f) rk=rk.filter(r=>r.kec===f);
+  rk=rk.filter(r=>(r.terduga||0)>0);   // sembunyikan puskesmas tanpa data Terduga TB (ekspor tb06 terpotong) — display only
   const col=PKCOLS.find(c=>c.k===pkSortKey);
   if(!col) rk.sort((a,b)=>b.kasus-a.kasus);
   else if(col.cat) rk.sort((a,b)=> pkSortAsc? col.v(a).localeCompare(col.v(b)) : col.v(b).localeCompare(col.v(a)));
