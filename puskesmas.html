@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cascade Spasio-Temporal TBC — Kota Bandung</title>
+<title>Cascade TBC Fokus Puskesmas — Kota Bandung</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
@@ -35,8 +35,9 @@
   .grid{display:grid;grid-template-columns:1.55fr 1fr;gap:12px}
   @media(max-width:900px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
   #map{height:560px;border-radius:10px;border:1px solid var(--line)}
-  .mainrow{display:grid;grid-template-columns:1fr 450px;gap:12px;align-items:stretch}
-  @media(max-width:1080px){.mainrow{grid-template-columns:1fr}}
+  .mainrow{display:grid;grid-template-columns:1fr 420px;gap:12px;align-items:start}
+  @media(max-width:1000px){.mainrow{grid-template-columns:1fr}}
+  #fkPanel{max-height:620px;overflow:auto}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   @media(max-width:760px){.grid2{grid-template-columns:1fr}}
   .alur-panel{display:flex;flex-direction:column}
@@ -77,6 +78,11 @@
   .frank .fr{display:flex;align-items:center;gap:6px}
   .frank .fb{flex:1;background:#eef3fb;border-radius:4px} .frank .fb>span{display:block;height:10px;border-radius:4px}
   .frank .fk{flex:0 0 40px;text-align:right;font-weight:700} .frank .fp{flex:0 0 92px;text-align:right;color:var(--mut);font-size:.68rem}
+  .tblwrap{overflow-x:auto;margin-top:4px}
+  #pkDetail{border-collapse:collapse;width:100%;font-size:.74rem;white-space:nowrap}
+  #pkDetail th,#pkDetail td{border:1px solid var(--line);padding:4px 8px;text-align:right}
+  #pkDetail th{background:#f2f2f2;color:var(--navy);position:sticky;top:0}
+  #pkDetail td.cat,#pkDetail th.cat{text-align:left;font-weight:600;max-width:240px;white-space:normal}
   .menu{background:#123a63;display:flex;flex-wrap:wrap;gap:8px;padding:9px 20px;align-items:center}
   .menu a,.menu span{display:inline-block;border-radius:8px;padding:6px 14px;font-size:.8rem;font-weight:600;white-space:nowrap;text-decoration:none;border:1px solid transparent}
   .menu a{color:#dceafd;background:rgba(255,255,255,.10)}
@@ -91,13 +97,13 @@
     <span class="logo-fb" hidden>UNPAD</span>
   </div>
   <div>
-    <h1>Cascade Spasio-Temporal TBC — Kota Bandung</h1>
-    <p>Kaskade pasien TBC · drill-down kecamatan → kelurahan · analisis faskes · SITB 2021–2026 · Penelitian Unpad</p>
+    <h1>Cascade TBC — Fokus Puskesmas — Kota Bandung</h1>
+    <p>Kaskade pasien TBC · titik & analisis faskes dibatasi <b>Puskesmas</b> · SITB 2021–2026 · Penelitian Unpad</p>
   </div>
 </header>
 <nav class="menu">
-  <span class="active">Dashboard</span>
-  <a href="puskesmas.html">Puskesmas</a>
+  <a href="index.html">Dashboard</a>
+  <span class="active">Puskesmas</span>
   <a href="statistik_transisi.html">Statistik Proses Pengobatan</a>
   <a href="statistik_ik.html">Statistik Investigasi Kontak</a>
 </nav>
@@ -119,40 +125,30 @@
     <span class="crumb" id="crumb"></span>
   </div>
 
+  <div style="margin-bottom:8px"><button id="drillBtn" style="display:none;width:auto">Drill down ke kecamatan ▾</button></div>
   <div class="mainrow">
     <div id="map"></div>
-    <div class="panel alur-panel">
-      <div style="font-weight:700;color:var(--navy)">Kaskade proses &amp; Investigasi Kontak
-        <span id="procYr" style="font-weight:400;color:var(--mut);font-size:.76rem"></span></div>
-      <svg id="flow" viewBox="0 18 760 832" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Alur proses kaskade TBC + Investigasi Kontak"></svg>
+    <div class="panel" id="fkPanel">
+      <div style="font-weight:700;color:var(--navy);margin-bottom:8px">Analisis Kemampuan Puskesmas menangani Cascade
+        <span id="fkCtx" style="font-weight:400;color:var(--mut);font-size:.8rem"></span></div>
+      <div class="fkh">Peringkat Puskesmas — volume · kesembuhan · IK</div>
+      <div id="fkRank"></div>
+      <div class="fkh" style="margin-top:12px">Domisili: dirawat di dalam vs luar kecamatan</div>
+      <div id="fkDonut" style="height:240px"></div>
     </div>
   </div>
-
-  <div class="grid2" id="cityWrap" style="margin-top:12px">
-    <div class="panel">
-      <button id="drillBtn" style="display:none">Drill down ke kelurahan ▾</button>
-      <div style="font-weight:700;color:var(--navy);margin-bottom:6px" id="trendHead">Tren bulanan kota</div>
-      <div id="trend"></div>
-    </div>
-    <div class="panel">
-      <div style="font-weight:700;color:var(--navy);margin-bottom:6px" id="topHead">Kecamatan teratas</div>
-      <div id="top"></div>
-    </div>
-  </div>
-  <div class="panel" id="detailPanel" style="display:none;margin-top:12px"></div>
 
   <div class="panel" style="margin-top:12px">
-    <div style="font-weight:700;color:var(--navy);margin-bottom:8px">Analisis Kemampuan Faskes menangani Cascade
-      <span id="fkCtx" style="font-weight:400;color:var(--mut);font-size:.8rem"></span></div>
-    <div class="fkgrid">
-      <div><div class="fkh">Peringkat faskes — volume · kesembuhan · IK</div><div id="fkRank"></div></div>
-      <div><div class="fkh">Domisili: dirawat di dalam vs luar kecamatan</div><div id="fkDonut" style="height:260px"></div></div>
-    </div>
-    <div class="fkflow">
-      <div class="fkh">Aliran domisili → faskes (kecamatan)</div>
-      <div class="fkslider">Jumlah aliran ditampilkan: <input type="range" id="fkN" min="5" max="40" value="14"> <b id="fkNv">14</b> teratas</div>
-      <div id="fkFlow" style="height:420px"></div>
-    </div>
+    <div style="font-weight:700;color:var(--navy);margin-bottom:4px">Detail kemampuan Puskesmas — catatan alur proses TB
+      <span id="pkCtx" style="font-weight:400;color:var(--mut);font-size:.8rem"></span></div>
+    <div style="font-size:.68rem;color:var(--mut);margin-bottom:6px">Tiap kolom = jumlah yang <b>dicatat puskesmas ini</b> pada tahap tsb. Terduga/Terdiagnosis (tb06, tempat terduga terdaftar) · Mulai obat/Sembuh (tb03, tempat pengobatan) · IK/TPT (investigasi kontak) — pasien bisa berbeda faskes antar tahap.</div>
+    <div class="tblwrap"><table id="pkDetail"></table></div>
+  </div>
+
+  <div class="panel fkflow" style="margin-top:12px;border-top:0">
+    <div class="fkh">Aliran domisili → Puskesmas (kecamatan)</div>
+    <div class="fkslider">Jumlah aliran ditampilkan: <input type="range" id="fkN" min="5" max="40" value="14"> <b id="fkNv">14</b> teratas</div>
+    <div id="fkFlow" style="height:420px"></div>
   </div>
 </div>
 <script>
@@ -230,7 +226,7 @@ let DATA,FDATA,RWDATA,GEO_KEL,GEO_KEC,FASKB,master={},kelCentroid={},kecCentroid
 function viewKota(){ map.setView(CITY,12,{animate:false}); map.panBy([100,0],{animate:false}); }
 let layer,map,legendCtl,labelLayer;
 let year='semua',metric='kasus',showNum=false,level='kota',cityUnit='kec',selKec=null,selKel=null,selLayer=null,pickedKec=null,pickLayer=null;
-let faskesCtrl=null,faskesGroups={},faskesActive=new Set();
+let faskesCtrl=null,faskesGroups={},faskesActive=new Set(['Puskesmas']);
 const norm=s=>String(s).toUpperCase().replace(/[^A-Z0-9]/g,'');
 const fmt=n=>n==null?'–':n.toLocaleString('id-ID');
 const chart=id=>{const el=document.getElementById(id);return echarts.getInstanceByDom(el)||echarts.init(el);};
@@ -370,7 +366,7 @@ function drawLabels(){
   }
   labelLayer.addTo(map);
 }
-function drawTop(){
+function drawTop(){ if(!document.getElementById('top'))return;
   const f=FOCUS(), per=DATA.peta[year]||{};
   let list, unit;
   if(f){ list=DATA.kelurahan.filter(k=>norm(k.kec)===f).map(k=>({d:k.desa,v:val(per[k.kel])})); unit='Kelurahan'; }
@@ -421,13 +417,13 @@ function setPick(nk, lyr){
     if(lyr) pickLayer=lyr; else layer.eachLayer(l=>{ if(l.feature&&norm(l.feature.properties.KEC)===pickedKec) pickLayer=l; });
     if(pickLayer) pickLayer.setStyle({weight:3,color:'#0F2E4E'});
   }
-  const db=document.getElementById('drillBtn'); db.textContent='Drill down ke kelurahan ▾'; db.style.display = pickedKec? '' : 'none';
+  const db=document.getElementById('drillBtn'); if(db){db.textContent='Drill down ke kecamatan ▾'; db.style.display = pickedKec? '' : 'none';}
   kpis(); trend(); crumb(); drawTop(); drawFaskesPanel(); drawProcess();   // ubah statistik, top-list, peringkat faskes, aliran, proses — TANPA ganti peta
 }
 function drillTo(nk){
   level='kec'; selKec=nk; pickedKec=nk; selKel=null;
   document.getElementById('kecSel').value=nk;
-  const db=document.getElementById('drillBtn'); db.textContent='Drill up ke Kota ▴'; db.style.display='';
+  const db=document.getElementById('drillBtn'); if(db){db.textContent='Drill up ke Kota ▴'; db.style.display='';}
   closeDetailPanel(); draw();
   renderFaskes(FASKB.filter(f=>f.kec===nk));
   if(kecBounds[nk]) map.fitBounds(kecBounds[nk],{padding:[20,20]});
@@ -435,14 +431,14 @@ function drillTo(nk){
 function backToKota(){
   level='kota'; selKec=null; selKel=null; selLayer=null; pickedKec=null; pickLayer=null;
   document.getElementById('kecSel').value='';
-  document.getElementById('drillBtn').style.display='none';
+  {const _d=document.getElementById('drillBtn'); if(_d)_d.style.display='none';}
   closeDetailPanel(); draw();
   renderFaskes(FASKB);
   viewKota();
 }
 
 /* ---------- detail kelurahan ---------- */
-function showDetail(nk){
+function showDetail(nk){ if(!document.getElementById('detailPanel'))return;
   const m=master[nk]||{}, per=DATA.peta[year]||{}, r=per[nk]||{kasus:0,berhasil:0,ik:0,tpt:0,rate:null};
   const pct=(a,b)=>b?Math.round(100*a/b)+'%':'–';
   document.getElementById('cityWrap').style.display='none';
@@ -495,11 +491,11 @@ function showDetail(nk){
             {name:'Sembuh',type:'bar',data:yrs.map(y=>get(y,'berhasil')),itemStyle:{color:'#1baf7a'}}]});
   drawProcess();   // proses & lag ikut kelurahan terpilih
 }
-function closeDetailPanel(){ document.getElementById('detailPanel').style.display='none'; document.getElementById('cityWrap').style.display='grid'; }
+function closeDetailPanel(){ const d=document.getElementById('detailPanel'),c=document.getElementById('cityWrap'); if(d)d.style.display='none'; if(c)c.style.display='grid'; }
 function closeKelDetail(){ if(!selKel) return; selKel=null; if(selLayer){layer.resetStyle(selLayer);selLayer=null;} closeDetailPanel(); drawProcess(); }
 
 /* ---------- diagram alur (angka dinamis + lag jadi label panah) ---------- */
-function drawProcess(){
+function drawProcess(){ if(!document.getElementById('flow'))return;
   const P=DATA.proses, f=FOCUS();
   let pr, wil;
   if(selKel && P.kel[selKel]){ pr=P.kel[selKel][year]; const m=(DATA.kelurahan||[]).find(k=>norm(k.kelurahan)===selKel); wil='kelurahan '+((m&&m.kelurahan)||selKel); }
@@ -515,7 +511,7 @@ function drawProcess(){
   const dyn={'terduga-diagnosis':lagfmt(pr.lag[0]), 'diagnosis-mulai':lagfmt(pr.lag[1]), 'mulai-berhasil':lagfmt(pr.lag[2])};
   drawAlur(vals, dyn);
 }
-function trend(){
+function trend(){ if(!document.getElementById('trend'))return;
   const f=FOCUS(), ym=Object.keys(DATA.tren_kota).sort();
   const src=f?((DATA.tren_kec||{})[f]||{}):DATA.tren_kota;
   document.getElementById('trendHead').textContent=f?('Tren bulanan kecamatan · '+(kecName[f]||f)):'Tren bulanan kota';
@@ -532,11 +528,11 @@ function trend(){
 /* ---------- analisis faskes ---------- */
 function drawFaskesPanel(){
   if(!FDATA) return;
-  const f=FOCUS();
+  const f=(level==='kec')?selKec:null;   // puskesmas: filter ke kecamatan saat drill
   document.getElementById('fkCtx').textContent='· '+(f?(kecName[f]||f):'Kota Bandung')+' · '+(year==='semua'?'2021–2026':'tahun '+year);
   let rk=(FDATA.peringkat[year]||[]).slice();
   if(f) rk=rk.filter(r=>r.kec===f);
-  const top=rk.sort((a,b)=>b.kasus-a.kasus).slice(0,10), mx=top[0]?.kasus||1;
+  const _s=rk.sort((a,b)=>b.kasus-a.kasus); const top=(level==='kec')?_s:_s.slice(0,5), mx=top[0]?.kasus||1;
   const jc={'Puskesmas':'#159e8f','Rumah Sakit':'#1d54a0','Klinik':'#e0710f'};
   document.getElementById('fkRank').innerHTML = top.length? top.map((r,i)=>{
     const bh=r.kasus?Math.round(100*r.berhasil/r.kasus):0, ikp=r.kasus?Math.round(100*r.ik/r.kasus):0, col=jc[r.jenis]||'#2A78D6';
@@ -554,10 +550,47 @@ function drawFaskesPanel(){
             {name:'Luar kecamatan',value:luar,itemStyle:{color:'#e0710f'}},
             ...(takp?[{name:'Tak terpetakan',value:takp,itemStyle:{color:'#c9c8c3'}}]:[])]}]});
   drawFlow();
+  drawPkDetail();
+}
+// kolom tabel detail — semua bisa di-sort
+const PKCOLS=[
+  {k:'nama', lab:'Puskesmas', cat:true, v:r=>String(r.nama||'')},
+  {k:'terduga', lab:'Terduga', v:r=>r.terduga||0},
+  {k:'terdiagnosis', lab:'Terdiagnosis', v:r=>r.terdiagnosis||0},
+  {k:'kasus', lab:'Mulai obat', v:r=>r.kasus||0},
+  {k:'berhasil', lab:'Sembuh', v:r=>r.berhasil||0},
+  {k:'sembuhpct', lab:'Sembuh%', v:r=>r.kasus?r.berhasil/r.kasus:-1, disp:r=>r.kasus?Math.round(100*r.berhasil/r.kasus)+'%':'–'},
+  {k:'ik', lab:'IK', v:r=>r.ik||0},
+  {k:'ikpct', lab:'IK%', v:r=>r.kasus?r.ik/r.kasus:-1, disp:r=>r.kasus?Math.round(100*r.ik/r.kasus)+'%':'–'},
+  {k:'tpt', lab:'TPT', v:r=>r.tpt||0},
+];
+let pkSortKey=null, pkSortAsc=false;   // null=default (kasus desc)
+function drawPkDetail(){
+  if(!FDATA||!document.getElementById('pkDetail')) return;
+  const f=(level==='kec')?selKec:null;
+  let rk=(FDATA.peringkat[year]||[]).slice();
+  if(f) rk=rk.filter(r=>r.kec===f);
+  const col=PKCOLS.find(c=>c.k===pkSortKey);
+  if(!col) rk.sort((a,b)=>b.kasus-a.kasus);
+  else if(col.cat) rk.sort((a,b)=> pkSortAsc? col.v(a).localeCompare(col.v(b)) : col.v(b).localeCompare(col.v(a)));
+  else rk.sort((a,b)=> pkSortAsc? col.v(a)-col.v(b) : col.v(b)-col.v(a));
+  document.getElementById('pkCtx').textContent='· '+(f?(kecName[f]||f):'semua Kota Bandung')+' · '+(year==='semua'?'2021–2026':'tahun '+year)+' · '+rk.length+' puskesmas';
+  const head='<tr>'+PKCOLS.map(c=>{
+    const on=c.k===pkSortKey, ar=on?(pkSortAsc?'▲':'▼'):'<span style="opacity:.35">▲▼</span>';
+    return `<th class="pksort${c.cat?' cat':''}" data-k="${c.k}" style="cursor:pointer;user-select:none" title="klik untuk urutkan">${c.lab} ${ar}</th>`;
+  }).join('')+'</tr>';
+  const rows=rk.map(r=>'<tr>'+PKCOLS.map(c=>
+    c.cat?`<td class="cat">${r.nama}</td>`:`<td>${c.disp?c.disp(r):fmt(c.v(r))}</td>`).join('')+'</tr>').join('');
+  document.getElementById('pkDetail').innerHTML=head+rows;
+  document.querySelectorAll('#pkDetail th.pksort').forEach(th=>th.onclick=()=>{
+    const k=th.dataset.k;
+    if(pkSortKey===k) pkSortAsc=!pkSortAsc; else { pkSortKey=k; pkSortAsc=(k==='nama'); }
+    drawPkDetail();
+  });
 }
 function drawFlow(){
   if(!FDATA) return;
-  const f=FOCUS(), N=+document.getElementById('fkN').value;
+  const f=(level==='kec')?selKec:null, N=+document.getElementById('fkN').value;
   document.getElementById('fkNv').textContent=N;
   let al=(FDATA.alir[year]||[]).slice();
   if(f) al=al.filter(p=>p.dom===f);
@@ -579,13 +612,13 @@ function drawFlow(){
 
 Promise.all([
   fetch('data/cascade_spatial.json').then(r=>r.json()),
-  fetch('data/faskes_cascade.json').then(r=>r.json()),
+  fetch('data/faskes_cascade_puskesmas.json').then(r=>r.json()),
   fetch('data/rw_cascade.json').then(r=>r.json()),
   fetch('data/geo/bandung_kelurahan.geojson').then(r=>r.json()),
   fetch('data/geo/bandung_kecamatan.geojson').then(r=>r.json()),
   fetch('data/geo/faskes_bandung.json').then(r=>r.json())
 ]).then(([d,fd,rw,gkel,gkec,fkb])=>{
-  DATA=d; FDATA=fd; RWDATA=rw; GEO_KEL=gkel; GEO_KEC=gkec; FASKB=fkb; d.kelurahan.forEach(k=>master[k.kel]=k);
+  DATA=d; FDATA=fd; RWDATA=rw; GEO_KEL=gkel; GEO_KEC=gkec; FASKB=fkb.filter(f=>f.lv==='Puskesmas'); d.kelurahan.forEach(k=>master[k.kel]=k);
   map=L.map('map',{scrollWheelZoom:true}).setView(CITY,12);
   cityBounds=L.geoJSON(GEO_KEC).getBounds();
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap, © CARTO',maxZoom:18}).addTo(map);
@@ -603,9 +636,9 @@ Promise.all([
   const opts=GEO_KEC.features.map(f=>({nk:norm(f.properties.KEC),nm:f.properties.KEC})).sort((a,b)=>a.nm.localeCompare(b.nm));
   document.getElementById('kecSel').innerHTML='<option value="">Semua kecamatan (Kota Bandung)</option>'+opts.map(o=>`<option value="${o.nk}">${o.nm}</option>`).join('');
   document.getElementById('kecSel').onchange=e=>{ const v=e.target.value; v?drillTo(v):backToKota(); };   // pilih kecamatan = langsung drill (spt tombol drill down)
-  document.getElementById('drillBtn').onclick=()=>{ if(level==='kec') backToKota(); else if(pickedKec) drillTo(pickedKec); };
+  {const _db=document.getElementById('drillBtn'); if(_db)_db.onclick=()=>{ if(level==='kec') backToKota(); else if(pickedKec) drillTo(pickedKec); };}
   document.getElementById('metric').onchange=e=>{metric=e.target.value; draw();};
-  document.getElementById('cityUnit').onchange=e=>{cityUnit=e.target.value; selKel=null; pickedKec=null; pickLayer=null; document.getElementById('drillBtn').style.display='none'; if(level==='kota') draw();};
+  document.getElementById('cityUnit').onchange=e=>{cityUnit=e.target.value; selKel=null; pickedKec=null; pickLayer=null; {const _d=document.getElementById('drillBtn'); if(_d)_d.style.display='none';} if(level==='kota') draw();};
   document.getElementById('tNum').onchange=e=>{showNum=e.target.checked; drawLabels();};
   document.getElementById('fkN').oninput=drawFlow;
   draw(); trend(); drawProcess(); viewKota();
