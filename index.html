@@ -77,6 +77,11 @@
   .frank .fr{display:flex;align-items:center;gap:6px}
   .frank .fb{flex:1;background:#eef3fb;border-radius:4px} .frank .fb>span{display:block;height:10px;border-radius:4px}
   .frank .fk{flex:0 0 40px;text-align:right;font-weight:700} .frank .fp{flex:0 0 92px;text-align:right;color:var(--mut);font-size:.68rem}
+  .menu{background:#123a63;display:flex;flex-wrap:wrap;gap:8px;padding:9px 20px;align-items:center}
+  .menu a,.menu span{display:inline-block;border-radius:8px;padding:6px 14px;font-size:.8rem;font-weight:600;white-space:nowrap;text-decoration:none;border:1px solid transparent}
+  .menu a{color:#dceafd;background:rgba(255,255,255,.10)}
+  .menu a:hover{background:rgba(255,255,255,.22)}
+  .menu span.active{color:#0f2e4e;background:#fff;cursor:default}
 </style>
 </head>
 <body>
@@ -89,12 +94,12 @@
     <h1>Cascade Spasio-Temporal TBC — Kota Bandung</h1>
     <p>Kaskade pasien TBC · drill-down kecamatan → kelurahan · analisis faskes · SITB 2021–2026 · Penelitian Unpad</p>
   </div>
-  <nav class="hnav">
-    <span class="active">Dashboard</span>
-    <a href="statistik_transisi.html">Statistik Proses</a>
-    <a href="statistik_ik.html">Statistik Investigasi Kontak</a>
-  </nav>
 </header>
+<nav class="menu">
+  <span class="active">Dashboard</span>
+  <a href="statistik_transisi.html">Statistik Proses</a>
+  <a href="statistik_ik.html">Statistik Investigasi Kontak</a>
+</nav>
 <div class="wrap">
   <div class="kpis" id="kpis"></div>
   <div class="controls">

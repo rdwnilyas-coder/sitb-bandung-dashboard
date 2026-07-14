@@ -49,6 +49,11 @@
   .keypts .kp-h{font-weight:700;color:var(--navy);font-size:.82rem;margin-bottom:2px}
   .keypts ul{margin:0;padding-left:18px} .keypts li{font-size:.78rem;color:#333;line-height:1.5;margin:3px 0}
   .keypts b{color:var(--navy)}
+  .menu{background:#123a63;display:flex;flex-wrap:wrap;gap:8px;padding:9px 20px;align-items:center}
+  .menu a,.menu span{display:inline-block;border-radius:8px;padding:6px 14px;font-size:.8rem;font-weight:600;white-space:nowrap;text-decoration:none;border:1px solid transparent}
+  .menu a{color:#dceafd;background:rgba(255,255,255,.10)}
+  .menu a:hover{background:rgba(255,255,255,.22)}
+  .menu span.active{color:#0f2e4e;background:#fff;cursor:default}
 </style>
 </head>
 <body>
@@ -58,12 +63,12 @@
     <h1>Statistik Deskriptif Durasi Transisi State TB</h1>
     <p>Ukuran sentral & sebaran waktu antar tahap · Kota Bandung · SITB 2021–2026</p>
   </div>
-  <nav class="hnav">
-    <a href="index.html">Dashboard</a>
-    <span class="active">Statistik Proses</span>
-    <a href="statistik_ik.html">Statistik Investigasi Kontak</a>
-  </nav>
 </header>
+<nav class="menu">
+  <a href="index.html">Dashboard</a>
+  <span class="active">Statistik Proses</span>
+  <a href="statistik_ik.html">Statistik Investigasi Kontak</a>
+</nav>
 <div class="wrap">
   <div class="controls">
     <label>Rincian (breakdown):
