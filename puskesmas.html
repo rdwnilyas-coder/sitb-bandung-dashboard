@@ -555,6 +555,7 @@ function drawFaskesPanel(){
 // kolom tabel detail — semua bisa di-sort
 const PKCOLS=[
   {k:'nama', lab:'Puskesmas', cat:true, v:r=>String(r.nama||'')},
+  {k:'kode', lab:'Kode Fasyankes', cat:true, v:r=>String(r.kode||'')},
   {k:'terduga', lab:'Terduga', v:r=>r.terduga||0},
   {k:'terdiagnosis', lab:'Terdiagnosis', v:r=>r.terdiagnosis||0},
   {k:'kasus', lab:'Mulai obat', v:r=>r.kasus||0},
@@ -570,7 +571,6 @@ function drawPkDetail(){
   const f=(level==='kec')?selKec:null;
   let rk=(FDATA.peringkat[year]||[]).slice();
   if(f) rk=rk.filter(r=>r.kec===f);
-  rk=rk.filter(r=>(r.terduga||0)>0);   // sembunyikan puskesmas tanpa data Terduga TB (ekspor tb06 terpotong) — display only
   const col=PKCOLS.find(c=>c.k===pkSortKey);
   if(!col) rk.sort((a,b)=>b.kasus-a.kasus);
   else if(col.cat) rk.sort((a,b)=> pkSortAsc? col.v(a).localeCompare(col.v(b)) : col.v(b).localeCompare(col.v(a)));
@@ -581,7 +581,7 @@ function drawPkDetail(){
     return `<th class="pksort${c.cat?' cat':''}" data-k="${c.k}" style="cursor:pointer;user-select:none" title="klik untuk urutkan">${c.lab} ${ar}</th>`;
   }).join('')+'</tr>';
   const rows=rk.map(r=>'<tr>'+PKCOLS.map(c=>
-    c.cat?`<td class="cat">${r.nama}</td>`:`<td>${c.disp?c.disp(r):fmt(c.v(r))}</td>`).join('')+'</tr>').join('');
+    c.cat?`<td class="cat">${c.v(r)}</td>`:`<td>${c.disp?c.disp(r):fmt(c.v(r))}</td>`).join('')+'</tr>').join('');
   document.getElementById('pkDetail').innerHTML=head+rows;
   document.querySelectorAll('#pkDetail th.pksort').forEach(th=>th.onclick=()=>{
     const k=th.dataset.k;
