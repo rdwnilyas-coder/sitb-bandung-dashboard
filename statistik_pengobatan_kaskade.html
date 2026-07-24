@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kaskade Perawatan Pengobatan TB — Kota Bandung</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  :root{--navy:#0F2E4E;--blue:#2A78D6;--ink:#0b0b0b;--mut:#52514e;--line:#e2e1dd;--bg:#f7f7f5}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+  header{background:var(--navy);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px}
+  .brand-logo{background:#fff;border-radius:12px;padding:6px 12px;display:flex;align-items:center;min-width:66px;min-height:54px;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+  .brand-logo img{height:46px;width:auto;display:block}
+  header h1{margin:0;font-size:1.12rem} header p{margin:3px 0 0;font-size:.8rem;color:#9ab6e0}
+  .wrap{max-width:1180px;margin:0 auto;padding:14px 16px}
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:12px}
+  select{padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:.85rem}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+  h3{color:var(--navy);margin:2px 0 4px;font-size:1rem}
+  .sub{font-size:.75rem;color:var(--mut);margin:0 0 8px}
+  .echart{width:100%}
+  #panelA .echart{height:340px} #panelB .echart{height:380px}
+  .tblwrap{overflow-x:auto;margin-top:8px}
+  table{border-collapse:collapse;width:100%;font-size:.78rem;white-space:nowrap}
+  th,td{border:1px solid var(--line);padding:5px 9px;text-align:right}
+  th{background:#f2f2f2;color:var(--navy)}
+  td.cat,th.cat{text-align:left;font-weight:600}
+  .foot{font-size:.72rem;color:var(--mut);line-height:1.55}
+  .keypts{margin-top:10px;background:#f6f9fd;border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:8px;padding:8px 12px}
+  .keypts .kp-h{font-weight:700;color:var(--navy);font-size:.82rem;margin-bottom:2px}
+  .keypts ul{margin:0;padding-left:18px} .keypts li{font-size:.79rem;color:#333;line-height:1.5;margin:3px 0}
+  .keypts b{color:var(--navy)}
+  code{background:#eef1f5;padding:1px 5px;border-radius:4px;font-size:.86em;color:#0F2E4E;font-family:ui-monospace,Menlo,monospace}
+  .menu{background:#123a63;display:flex;flex-wrap:wrap;gap:8px;padding:9px 20px;align-items:center}
+  .menu a,.menu span{display:inline-block;border-radius:8px;padding:6px 14px;font-size:.8rem;font-weight:600;white-space:nowrap;text-decoration:none;border:1px solid transparent}
+  .menu a{color:#dceafd;background:rgba(255,255,255,.10)}
+  .menu a:hover{background:rgba(255,255,255,.22)}
+  .menu span.active{color:#0f2e4e;background:#fff;cursor:default}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand-logo"><img src="logo_unpad.png" alt="Universitas Padjadjaran" onerror="this.style.display='none'"></div>
+  <div><h1 id="h-title"></h1><p id="h-sub"></p></div>
+</header>
+<nav class="menu" id="menu"></nav>
+<div class="wrap">
+  <div class="controls">
+    <label id="lbl-scope"></label>
+    <span id="scopeNote" style="font-size:.78rem;color:var(--mut)"></span>
+  </div>
+  <div class="panel" id="panelA">
+    <h3 id="tA"></h3><p class="sub" id="sA"></p>
+    <div class="echart" id="chartA"></div>
+    <div class="tblwrap" id="tblA"></div>
+  </div>
+  <div class="panel" id="panelB">
+    <h3 id="tB"></h3><p class="sub" id="sB"></p>
+    <div class="echart" id="chartB"></div>
+  </div>
+  <div class="panel" id="keybox"></div>
+  <div class="panel foot" id="foot"></div>
+</div>
+<script>
+const LANG='id';
+const NAV=[['index.html','Dashboard','Dashboard'],['puskesmas.html','Puskesmas','Health centres'],
+ ['statistik_transisi.html','Statistik Proses Pengobatan','Treatment Process Statistics'],
+ ['statistik_ik.html','Statistik Investigasi Kontak','Contact Investigation Statistics'],
+ ['statistik_pengobatan_kaskade.html','Kaskade Pengobatan','Treatment Cascade'],
+ ['statistik_ik_kaskade.html','Kaskade Investigasi Kontak','Contact Investigation Cascade']];
+const ACTIVE='statistik_pengobatan_kaskade.html';
+const T={
+ id:{title:'Kaskade Perawatan Pengobatan TB',
+     sub:'Retensi & kehilangan pasien sepanjang kontinum pengobatan (SO+RO) · Kota Bandung · SITB 2021–2026',
+     scope:'Rincian (breakdown):',opt:{keseluruhan:'Keseluruhan Kota Bandung',tahun:'Per tahun',kecamatan:'Per kecamatan (domisili)'},
+     tA:'A · Kaskade perawatan pengobatan (kehilangan tiap tahap)',sA:'Persentase dihitung terhadap jumlah terduga (populasi rujukan).',
+     tB:'B · Distribusi pasien: kehilangan vs lanjut tiap tahap',sB:'Aliran dari terduga; tiap tahap terpecah menjadi hilang (abu) dan lanjut (warna).',
+     loss:'Hilang',unit:'orang',
+     thStage:'Tahap',thN:'Jumlah',thPct:'% terduga',thDrop:'Kehilangan dari tahap sebelumnya',
+     kpH:'Poin penting temuan',
+     kp:(r,pct,worst)=>[
+       `Dari <b>${fmt(r.ter)}</b> terduga, <b>${fmt(r.diag)}</b> (${pct.diag}%) terdiagnosis, <b>${fmt(r.mulai)}</b> (${pct.mulai}%) mulai pengobatan, dan <b>${fmt(r.berhasil)}</b> (${pct.berhasil}%) berhasil.`,
+       `Kehilangan terbesar pada transisi <b>${worst.lab}</b> (turun ${worst.drop} poin persen) — titik bocor utama kaskade.`,
+       `Keberhasilan pengobatan di antara yang memulai: <b>${r.mulai?Math.round(100*r.berhasil/r.mulai):0}%</b> (${fmt(r.berhasil)}/${fmt(r.mulai)}).`,
+     ],
+     foot:'Sumber <code>tb06</code> (terduga, dedup register) + <code>tb03</code> (pengobatan SO/RO), via <code>cascade_spatial</code>. Angka absolut dipengaruhi truncation ekspor & keberhasilan record linkage; sel kecil tafsir hati-hati.',
+     fail:'Gagal memuat data/pengobatan_cascade.json — jalankan analytics/agg_pengobatan_cascade.py lalu buka lewat server.'},
+ en:{title:'TB Treatment Cascade of Care',
+     sub:'Patient retention & losses along the treatment continuum (DS+DR) · Bandung City · SITB 2021–2026',
+     scope:'Breakdown:',opt:{keseluruhan:'Whole Bandung City',tahun:'By year',kecamatan:'By district (residence)'},
+     tA:'A · Treatment cascade of care (losses at each stage)',sA:'Percentages are calculated among presumptive cases (reference population).',
+     tB:'B · Patient distribution: loss vs continue at each stage',sB:'Flow from presumptive cases; each stage splits into lost (grey) and continuing (colour).',
+     loss:'Lost',unit:'people',
+     thStage:'Stage',thN:'Count',thPct:'% presumptive',thDrop:'Drop from previous stage',
+     kpH:'Key findings',
+     kp:(r,pct,worst)=>[
+       `Of <b>${fmt(r.ter)}</b> presumptive, <b>${fmt(r.diag)}</b> (${pct.diag}%) were diagnosed, <b>${fmt(r.mulai)}</b> (${pct.mulai}%) started treatment, and <b>${fmt(r.berhasil)}</b> (${pct.berhasil}%) succeeded.`,
+       `The largest loss is at the <b>${worst.lab}</b> transition (down ${worst.drop} percentage points) — the main leakage point.`,
+       `Treatment success among those who started: <b>${r.mulai?Math.round(100*r.berhasil/r.mulai):0}%</b> (${fmt(r.berhasil)}/${fmt(r.mulai)}).`,
+     ],
+     foot:'Source <code>tb06</code> (presumptive, deduplicated) + <code>tb03</code> (DS/DR treatment), via <code>cascade_spatial</code>. Absolute counts affected by export truncation & record-linkage completeness; small cells interpret with caution.',
+     fail:'Failed to load data/pengobatan_cascade.json — run analytics/agg_pengobatan_cascade.py then open via server.'}
+}[LANG];
+document.documentElement.lang=LANG;
+const fmt=n=>n==null?'–':(+n).toLocaleString(LANG==='id'?'id-ID':'en-US');
+const STCOL=['#8a9a2e','#5a9a3a','#1f8a76','#256abf'];
+let DATA, charts={};
+
+document.getElementById('h-title').textContent=T.title;
+document.getElementById('h-sub').textContent=T.sub;
+document.getElementById('menu').innerHTML=NAV.map(([h,idl,enl])=>{const l=LANG==='id'?idl:enl;return h===ACTIVE?`<span class="active">${l}</span>`:`<a href="${h}">${l}</a>`;}).join('');
+document.getElementById('lbl-scope').innerHTML=T.scope+' <select id="scope"><option value="keseluruhan">'+T.opt.keseluruhan+'</option><option value="tahun">'+T.opt.tahun+'</option><option value="kecamatan">'+T.opt.kecamatan+'</option></select>';
+['tA','sA','tB','sB'].forEach(k=>document.getElementById(k).textContent=T[k]);
+
+const stLab=s=>s[LANG];
+const pctOf=r=>{const o={};DATA.stages.forEach(s=>o[s.key]=r.ter?Math.round(100*r[s.key]/r.ter):0);return o;};
+
+function panelA(r){
+  const P=pctOf(r), stages=DATA.stages;
+  const c=charts.A||(charts.A=echarts.init(document.getElementById('chartA')));
+  c.setOption({
+    grid:{left:54,right:26,top:52,bottom:24},
+    title:{text:T.thPct,left:2,top:6,textStyle:{fontSize:11,color:'#52514e',fontWeight:'normal'}},
+    tooltip:{trigger:'axis',confine:true,formatter:p=>{const s=stages[p[0].dataIndex];return `<b>${stLab(s)}</b><br>${fmt(r[s.key])} ${T.unit} · ${P[s.key]}%`;}},
+    xAxis:{type:'category',data:stages.map(s=>stLab(s)),axisLabel:{show:false},axisTick:{show:false}},
+    yAxis:{type:'value',min:0,max:100,axisLabel:{formatter:'{value}%'}},
+    series:[{type:'line',step:'end',symbol:'circle',symbolSize:9,
+      lineStyle:{color:'#8a94a6',width:2},itemStyle:{color:'#c0392b'},
+      data:stages.map((s,i)=>({value:P[s.key],
+        label:{show:true,position:i<1?'right':'top',distance:8,fontSize:10.5,color:'#0F2E4E',align:i<1?'left':'center',
+          formatter:`{n|${stLab(s)}}\n{v|${fmt(r[s.key])} · ${P[s.key]}%}`,
+          rich:{n:{fontWeight:'bold',color:'#0F2E4E',fontSize:10.5,lineHeight:14},v:{color:'#52514e',fontSize:9.5,lineHeight:13}}}}))}]
+  },true);
+}
+function tableA(r){
+  const P=pctOf(r); let prev=null;
+  const rows=DATA.stages.map(s=>{const drop=prev==null?'–':((prev-P[s.key])+' pp');prev=P[s.key];
+    return `<tr><td class="cat">${stLab(s)} <span style="color:#9aa">(${s['sub_'+LANG]})</span></td><td>${fmt(r[s.key])}</td><td>${P[s.key]}%</td><td>${drop}</td></tr>`;});
+  document.getElementById('tblA').innerHTML=`<table><tr><th class="cat">${T.thStage}</th><th>${T.thN}</th><th>${T.thPct}</th><th>${T.thDrop}</th></tr>${rows.join('')}</table>`;
+}
+function panelB(r){
+  const st=DATA.stages, nodes=[], links=[], pc=v=>r.ter?Math.round(100*v/r.ter):null;
+  st.forEach((s,i)=>nodes.push({name:stLab(s),value:r[s.key],pct:pc(r[s.key]),itemStyle:{color:STCOL[i]}}));
+  for(let i=0;i<st.length-1;i++){
+    const cur=r[st[i].key], nxt=r[st[i+1].key], cont=Math.min(nxt,cur), loss=Math.max(0,cur-nxt);
+    links.push({source:stLab(st[i]),target:stLab(st[i+1]),value:Math.max(cont,0),lineStyle:{color:STCOL[i+1],opacity:.45}});
+    if(loss>0){const ln=`${T.loss} @ ${stLab(st[i])}`;nodes.push({name:ln,value:loss,pct:pc(loss),itemStyle:{color:'#c9c9c2'}});
+      links.push({source:stLab(st[i]),target:ln,value:loss,lineStyle:{color:'#c9c9c2',opacity:.5}});}
+  }
+  const c=charts.B||(charts.B=echarts.init(document.getElementById('chartB')));
+  c.setOption({tooltip:{trigger:'item',confine:true,formatter:p=>p.dataType==='edge'?`${p.data.source} → ${p.data.target}<br>${fmt(p.data.value)} ${T.unit}`:`<b>${p.name}</b><br>${fmt(p.data.value)} ${T.unit}${p.data.pct!=null?' · '+p.data.pct+'%':''}`},
+    series:[{type:'sankey',left:8,right:150,top:12,bottom:12,nodeWidth:14,nodeGap:11,
+      label:{fontSize:9.5,color:'#0b0b0b',formatter:p=>`${p.name}\n${fmt(p.data.value)}${p.data.pct!=null?' · '+p.data.pct+'%':''}`},
+      emphasis:{focus:'adjacency'},data:nodes,links:links}]},true);
+}
+function keyPts(r){
+  const P=pctOf(r), st=DATA.stages; let worst={drop:-1,lab:''},prev=null,pk;
+  st.forEach(s=>{if(prev!=null){const d=P[pk]-P[s.key];if(d>worst.drop)worst={drop:d,lab:`${stLab(st[st.findIndex(x=>x.key===pk)])} → ${stLab(s)}`};}prev=P[s.key];pk=s.key;});
+  document.getElementById('keybox').innerHTML=`<div class="keypts"><div class="kp-h">${T.kpH}</div><ul>${T.kp(r,P,worst).map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+}
+function render(){
+  const sc=document.getElementById('scope').value; let r;
+  if(sc==='keseluruhan'){r=DATA.data.keseluruhan.ALL;document.getElementById('scopeNote').textContent='';}
+  else{
+    const keys=sc==='tahun'?DATA.tahun:Object.keys(DATA.data.kecamatan);
+    const sel=document.getElementById('sel2'); const cur=(sel&&sel.value)||keys[0];
+    r=DATA.data[sc][cur];
+    document.getElementById('scopeNote').innerHTML=`<select id="sel2">`+keys.map(k=>`<option ${k===cur?'selected':''} value="${k}">${sc==='kecamatan'?(DATA.kecName[k]||k):k}</option>`).join('')+`</select>`;
+    document.getElementById('sel2').onchange=render;
+  }
+  panelA(r);tableA(r);panelB(r);keyPts(r);
+  document.getElementById('foot').innerHTML='<b>'+(LANG==='id'?'Catatan.':'Note.')+'</b> '+T.foot;
+}
+addEventListener('resize',()=>Object.values(charts).forEach(c=>c&&c.resize()));
+fetch('data/pengobatan_cascade.json').then(r=>r.json()).then(d=>{DATA=d;
+  document.getElementById('scope').onchange=render; render();})
+  .catch(e=>{document.getElementById('panelA').innerHTML='<div class="panel">'+T.fail+'</div>';});
+</script>
+</body>
+</html>

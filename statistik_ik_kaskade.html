@@ -76,7 +76,7 @@ const LANG='id';
 const T={
  id:{title:'Kaskade Perawatan Investigasi Kontak & TPT',
      sub:'Retensi & kehilangan kontak sepanjang kaskade IK → TPT · Kota Bandung · SITB 2021–2026',
-     nav:[['index.html','Dashboard',0],['puskesmas.html','Puskesmas',0],['statistik_transisi.html','Statistik Proses Pengobatan',0],['statistik_ik_kaskade.html','Kaskade Investigasi Kontak',1],['statistik_ik.html','Statistik Investigasi Kontak',0]],
+     nav:[['index.html','Dashboard',0],['puskesmas.html','Puskesmas',0],['statistik_transisi.html','Statistik Proses Pengobatan',0],['statistik_ik.html','Statistik Investigasi Kontak',0],['statistik_pengobatan_kaskade.html','Kaskade Pengobatan',0],['statistik_ik_kaskade.html','Kaskade Investigasi Kontak',1]],
      scope:'Rincian (breakdown):',opt:{keseluruhan:'Keseluruhan Kota Bandung',tahun:'Per tahun',kecamatan:'Per kecamatan (domisili)'},
      tA:'A · Kaskade perawatan (kehilangan tiap tahap)',sA:'Persentase dihitung terhadap populasi rujukan (kontak teridentifikasi).',
      tB:'B · Distribusi kontak: kehilangan vs lanjut tiap tahap',sB:'Aliran kontak dari populasi rujukan; tiap tahap terpecah menjadi hilang (abu) dan lanjut (warna).',
@@ -94,7 +94,7 @@ const T={
      fail:'Gagal memuat data/ik_cascade.json — jalankan analytics/agg_ik_cascade.py lalu buka lewat server.'},
  en:{title:'Contact Investigation & TPT Cascade of Care',
      sub:'Contact retention & losses along the CI → TPT cascade · Bandung City · SITB 2021–2026',
-     nav:[['index.html','Dashboard',0],['puskesmas.html','Health centres',0],['statistik_transisi.html','Treatment Process Statistics',0],['statistik_ik_kaskade.html','Contact Investigation Cascade',1],['statistik_ik.html','Contact Investigation Statistics',0]],
+     nav:[['index.html','Dashboard',0],['puskesmas.html','Health centres',0],['statistik_transisi.html','Treatment Process Statistics',0],['statistik_ik.html','Contact Investigation Statistics',0],['statistik_pengobatan_kaskade.html','Treatment Cascade',0],['statistik_ik_kaskade.html','Contact Investigation Cascade',1]],
      scope:'Breakdown:',opt:{keseluruhan:'Whole Bandung City',tahun:'By year',kecamatan:'By district (residence)'},
      tA:'A · Cascade of care (losses at each stage)',sA:'Percentages are calculated among contacts initially identified (reference population).',
      tB:'B · Contact distribution: loss vs continue at each stage',sB:'Contact flow from the reference population; each stage splits into lost (grey) and continuing (colour).',
@@ -132,12 +132,16 @@ function panelA(r){
     grid:{left:54,right:26,top:52,bottom:70},
     title:{text:T.yaxis,left:2,top:6,textStyle:{fontSize:11,color:'#52514e',fontWeight:'normal'}},
     tooltip:{trigger:'axis',confine:true,formatter:p=>{const i=p[0].dataIndex,s=stages[i];return `<b>${stLab(s)}</b><br>${fmt(r[s.key])} ${T.contacts} · ${P[s.key]}%`;}},
-    xAxis:{type:'category',data:stages.map(s=>stLab(s)),axisLabel:{interval:0,fontSize:10,rotate:20,formatter:v=>v.length>15?v.slice(0,15)+'…':v}},
+    xAxis:{type:'category',data:stages.map(s=>stLab(s)),axisLabel:{show:false},axisTick:{show:false}},
     yAxis:{type:'value',min:0,max:100,axisLabel:{formatter:'{value}%'}},
-    series:[{type:'line',step:'end',data:stages.map(s=>P[s.key]),symbol:'circle',symbolSize:9,
+    series:[{type:'line',step:'end',symbol:'circle',symbolSize:9,
       lineStyle:{color:'#8a94a6',width:2},itemStyle:{color:'#c0392b'},
-      label:{show:true,position:'top',distance:8,fontSize:10,fontWeight:'bold',color:'#0F2E4E',
-        formatter:p=>`${fmt(r[stages[p.dataIndex].key])} · ${P[stages[p.dataIndex].key]}%`}}]
+      data:stages.map((s,i)=>({value:P[s.key],
+        label:{show:true,position:i<2?'right':'top',distance:8,fontSize:10.5,color:'#0F2E4E',
+          align:i<2?'left':'center',
+          formatter:`{n|${stLab(s)}}\n{v|${fmt(r[s.key])} · ${P[s.key]}%}`,
+          rich:{n:{fontWeight:'bold',color:'#0F2E4E',fontSize:10.5,lineHeight:14},
+                v:{color:'#52514e',fontSize:9.5,lineHeight:13}}}}))}]
   },true);
 }
 function tableA(r){
