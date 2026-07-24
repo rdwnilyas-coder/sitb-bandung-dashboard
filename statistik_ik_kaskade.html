@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kaskade Investigasi Kontak & TPT — Kota Bandung</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  :root{--navy:#0F2E4E;--blue:#2A78D6;--ink:#0b0b0b;--mut:#52514e;--line:#e2e1dd;--bg:#f7f7f5}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+  header{background:var(--navy);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px}
+  .brand-logo{background:#fff;border-radius:12px;padding:6px 12px;display:flex;align-items:center;min-width:66px;min-height:54px;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+  .brand-logo img{height:46px;width:auto;display:block}
+  header h1{margin:0;font-size:1.12rem} header p{margin:3px 0 0;font-size:.8rem;color:#9ab6e0}
+  .wrap{max-width:1180px;margin:0 auto;padding:14px 16px}
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:12px}
+  select{padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:.85rem}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+  h3{color:var(--navy);margin:2px 0 4px;font-size:1rem}
+  h3 span{font-weight:400;color:var(--mut);font-size:.8rem}
+  .sub{font-size:.75rem;color:var(--mut);margin:0 0 8px}
+  .echart{width:100%}
+  #panelA .echart{height:340px} #panelB .echart{height:420px} #panelC .echart{height:420px}
+  .tblwrap{overflow-x:auto;margin-top:8px}
+  table{border-collapse:collapse;width:100%;font-size:.78rem;white-space:nowrap}
+  th,td{border:1px solid var(--line);padding:5px 9px;text-align:right}
+  th{background:#f2f2f2;color:var(--navy)}
+  td.cat,th.cat{text-align:left;font-weight:600}
+  .foot{font-size:.72rem;color:var(--mut);line-height:1.55}
+  .keypts{margin-top:10px;background:#f6f9fd;border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:8px;padding:8px 12px}
+  .keypts .kp-h{font-weight:700;color:var(--navy);font-size:.82rem;margin-bottom:2px}
+  .keypts ul{margin:0;padding-left:18px} .keypts li{font-size:.79rem;color:#333;line-height:1.5;margin:3px 0}
+  .keypts b{color:var(--navy)}
+  .warn{color:#b3541e}
+  .menu{background:#123a63;display:flex;flex-wrap:wrap;gap:8px;padding:9px 20px;align-items:center}
+  .menu a,.menu span{display:inline-block;border-radius:8px;padding:6px 14px;font-size:.8rem;font-weight:600;white-space:nowrap;text-decoration:none;border:1px solid transparent}
+  .menu a{color:#dceafd;background:rgba(255,255,255,.10)}
+  .menu a:hover{background:rgba(255,255,255,.22)}
+  .menu span.active{color:#0f2e4e;background:#fff;cursor:default}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand-logo"><img src="logo_unpad.png" alt="Universitas Padjadjaran" onerror="this.style.display='none'"></div>
+  <div><h1 id="h-title"></h1><p id="h-sub"></p></div>
+</header>
+<nav class="menu" id="menu"></nav>
+<div class="wrap">
+  <div class="controls">
+    <label id="lbl-scope"></label>
+    <span id="scopeNote" style="font-size:.78rem;color:var(--mut)"></span>
+  </div>
+
+  <div class="panel" id="panelA">
+    <h3 id="tA"></h3><p class="sub" id="sA"></p>
+    <div class="echart" id="chartA"></div>
+    <div class="tblwrap" id="tblA"></div>
+  </div>
+
+  <div class="panel" id="panelB">
+    <h3 id="tB"></h3><p class="sub" id="sB"></p>
+    <div class="echart" id="chartB"></div>
+  </div>
+
+  <div class="panel" id="panelC">
+    <h3 id="tC"></h3><p class="sub" id="sC"></p>
+    <div class="echart" id="chartC"></div>
+  </div>
+
+  <div class="panel" id="keybox"></div>
+  <div class="panel foot" id="foot"></div>
+</div>
+<script>
+const LANG='id';
+const T={
+ id:{title:'Kaskade Perawatan Investigasi Kontak & TPT',
+     sub:'Retensi & kehilangan kontak sepanjang kaskade IK → TPT · Kota Bandung · SITB 2021–2026',
+     nav:[['index.html','Dashboard',0],['puskesmas.html','Puskesmas',0],['statistik_transisi.html','Statistik Proses Pengobatan',0],['statistik_ik_kaskade.html','Kaskade Investigasi Kontak',1],['statistik_ik.html','Statistik Investigasi Kontak',0]],
+     scope:'Rincian (breakdown):',opt:{keseluruhan:'Keseluruhan Kota Bandung',tahun:'Per tahun',kecamatan:'Per kecamatan (domisili)'},
+     tA:'A · Kaskade perawatan (kehilangan tiap tahap)',sA:'Persentase dihitung terhadap populasi rujukan (kontak teridentifikasi).',
+     tB:'B · Distribusi kontak: kehilangan vs lanjut tiap tahap',sB:'Aliran kontak dari populasi rujukan; tiap tahap terpecah menjadi hilang (abu) dan lanjut (warna).',
+     tC:'C · Menurut rekomendasi TPT (dari yang diperiksa)',sC:'Kontak diperiksa dipilah dengan/tanpa rekomendasi TPT, lalu memulai/menyelesaikan TPT.',
+     loss:'Hilang',cont:'Lanjut',withRec:'Dgn rekomendasi TPT',woRec:'Tanpa rekomendasi TPT',notInit:'Tidak memulai TPT',incompl:'TPT tak lengkap',
+     yaxis:'% populasi rujukan',contacts:'kontak',of:'dari',
+     thStage:'Tahap',thN:'Jumlah kontak',thPct:'% rujukan',thDrop:'Kehilangan dari tahap sebelumnya',
+     kpH:'Poin penting temuan',
+     kp:(r,pct,worst)=>[
+       `Dari <b>${fmt(r.ref)}</b> kontak teridentifikasi, hanya <b>${fmt(r.examined)}</b> (${pct.examined}%) yang diperiksa dan <b>${fmt(r.completed)}</b> (${pct.completed}%) menyelesaikan TPT.`,
+       `Kehilangan terbesar pada transisi <b>${worst.lab}</b> (turun ${worst.drop} poin persen) — titik bocor utama kaskade.`,
+       r.initiated>r.eligible?`<span class="warn">Catatan pelaporan:</span> "TPT dimulai" (${fmt(r.initiated)}) melebihi "Direkomendasi TPT" (${fmt(r.eligible)}) — pelanggaran funnel pelaporan, bukan kehilangan.`:`Dari ${fmt(r.eligible)} yang direkomendasi, ${fmt(r.initiated)} memulai dan ${fmt(r.completed)} menyelesaikan TPT.`,
+     ],
+     foot:'Sumber <code>tb16rk</code> (Investigasi Kontak), kecamatan = domisili pasien indeks (join <code>tb03</code>). Baris total ekspor dibuang (anti-dobel). Angka absolut dipengaruhi truncation ekspor & pelaporan; sel kecil tafsir hati-hati. Kaskade agregat kontak (bukan per kasus indeks).',
+     fail:'Gagal memuat data/ik_cascade.json — jalankan analytics/agg_ik_cascade.py lalu buka lewat server.'},
+ en:{title:'Contact Investigation & TPT Cascade of Care',
+     sub:'Contact retention & losses along the CI → TPT cascade · Bandung City · SITB 2021–2026',
+     nav:[['index.html','Dashboard',0],['puskesmas.html','Health centres',0],['statistik_transisi.html','Treatment Process Statistics',0],['statistik_ik_kaskade.html','Contact Investigation Cascade',1],['statistik_ik.html','Contact Investigation Statistics',0]],
+     scope:'Breakdown:',opt:{keseluruhan:'Whole Bandung City',tahun:'By year',kecamatan:'By district (residence)'},
+     tA:'A · Cascade of care (losses at each stage)',sA:'Percentages are calculated among contacts initially identified (reference population).',
+     tB:'B · Contact distribution: loss vs continue at each stage',sB:'Contact flow from the reference population; each stage splits into lost (grey) and continuing (colour).',
+     tC:'C · By TPT recommendation (among those examined)',sC:'Examined contacts split by with/without TPT recommendation, then TPT initiation/completion.',
+     loss:'Lost',cont:'Continue',withRec:'With TPT recommendation',woRec:'Without TPT recommendation',notInit:'Did not initiate TPT',incompl:'Incomplete TPT',
+     yaxis:'% of reference population',contacts:'contacts',of:'of',
+     thStage:'Stage',thN:'Contacts',thPct:'% of ref.',thDrop:'Drop from previous stage',
+     kpH:'Key findings',
+     kp:(r,pct,worst)=>[
+       `Of <b>${fmt(r.ref)}</b> contacts identified, only <b>${fmt(r.examined)}</b> (${pct.examined}%) were examined and <b>${fmt(r.completed)}</b> (${pct.completed}%) completed TPT.`,
+       `The largest loss is at the <b>${worst.lab}</b> transition (down ${worst.drop} percentage points) — the main leakage point.`,
+       r.initiated>r.eligible?`<span class="warn">Reporting note:</span> "TPT initiated" (${fmt(r.initiated)}) exceeds "Recommended for TPT" (${fmt(r.eligible)}) — a reporting funnel violation, not a loss.`:`Of ${fmt(r.eligible)} recommended, ${fmt(r.initiated)} initiated and ${fmt(r.completed)} completed TPT.`,
+     ],
+     foot:'Source <code>tb16rk</code> (Contact Investigation); district = index patient residence (join <code>tb03</code>). Export total row removed (anti double-count). Absolute counts affected by export truncation & reporting; small cells interpret with caution. Aggregate contact cascade (not per index case).',
+     fail:'Failed to load data/ik_cascade.json — run analytics/agg_ik_cascade.py then open via server.'}
+}[LANG];
+document.documentElement.lang=LANG;
+const fmt=n=>n==null?'–':(+n).toLocaleString(LANG==='id'?'id-ID':'en-US');
+const STCOL=['#8a9a2e','#c98a2e','#5a9a3a','#e07b2e','#1f8a76','#256abf'];
+let DATA, charts={};
+
+document.getElementById('h-title').textContent=T.title;
+document.getElementById('h-sub').textContent=T.sub;
+document.getElementById('menu').innerHTML=T.nav.map(([h,l,a])=>a?`<span class="active">${l}</span>`:`<a href="${h}">${l}</a>`).join('');
+document.getElementById('lbl-scope').innerHTML=T.scope+' <select id="scope"><option value="keseluruhan">'+T.opt.keseluruhan+'</option><option value="tahun">'+T.opt.tahun+'</option><option value="kecamatan">'+T.opt.kecamatan+'</option></select>';
+['tA','sA','tB','sB','tC','sC'].forEach(k=>document.getElementById(k).textContent=T[k]);
+
+function stLab(s){return s[LANG];}
+function pctOf(r){const o={};DATA.stages.forEach(s=>o[s.key]=r.ref?Math.round(100*r[s.key]/r.ref):0);return o;}
+
+function panelA(r){
+  const P=pctOf(r), stages=DATA.stages;
+  const el=document.getElementById('chartA'); const c=charts.A||(charts.A=echarts.init(el));
+  c.setOption({
+    grid:{left:52,right:20,top:20,bottom:64},
+    tooltip:{trigger:'axis',confine:true,formatter:p=>{const i=p[0].dataIndex,s=stages[i];return `<b>${stLab(s)}</b><br>${fmt(r[s.key])} ${T.contacts} · ${P[s.key]}%`;}},
+    xAxis:{type:'category',data:stages.map(s=>stLab(s)),axisLabel:{interval:0,fontSize:10,rotate:20,formatter:v=>v.length>15?v.slice(0,15)+'…':v}},
+    yAxis:{type:'value',min:0,max:100,name:T.yaxis,nameTextStyle:{fontSize:10},axisLabel:{formatter:'{value}%'}},
+    series:[{type:'line',step:'end',data:stages.map(s=>P[s.key]),symbol:'circle',symbolSize:9,
+      lineStyle:{color:'#8a94a6',width:2},itemStyle:{color:'#c0392b'},
+      label:{show:true,position:'top',fontSize:10,formatter:p=>`${fmt(r[stages[p.dataIndex].key])} · ${P[stages[p.dataIndex].key]}%`}}]
+  },true);
+}
+function tableA(r){
+  const P=pctOf(r), stages=DATA.stages; let prevPct=null;
+  const rows=stages.map(s=>{
+    const drop=prevPct==null?'–':((prevPct-P[s.key])+' pp');
+    prevPct=P[s.key];
+    return `<tr><td class="cat">${stLab(s)} <span style="color:#9aa">(${s['sub_'+LANG]})</span></td><td>${fmt(r[s.key])}</td><td>${P[s.key]}%</td><td>${drop}</td></tr>`;
+  });
+  document.getElementById('tblA').innerHTML=`<table><tr><th class="cat">${T.thStage}</th><th>${T.thN}</th><th>${T.thPct}</th><th>${T.thDrop}</th></tr>${rows.join('')}</table>`;
+}
+// sankey losses (panel B): tiap tahap -> lanjut (tahap berikut) + hilang
+function panelB(r){
+  const st=DATA.stages, nodes=[], links=[];
+  st.forEach((s,i)=>nodes.push({name:stLab(s),itemStyle:{color:STCOL[i]}}));
+  for(let i=0;i<st.length-1;i++){
+    const cur=r[st[i].key], nxt=r[st[i+1].key];
+    const cont=Math.min(nxt,cur), loss=Math.max(0,cur-nxt);
+    links.push({source:stLab(st[i]),target:stLab(st[i+1]),value:Math.max(cont,0),lineStyle:{color:STCOL[i+1],opacity:.45}});
+    if(loss>0){const ln=`${T.loss} @ ${stLab(st[i])}`;nodes.push({name:ln,itemStyle:{color:'#c9c9c2'}});
+      links.push({source:stLab(st[i]),target:ln,value:loss,lineStyle:{color:'#c9c9c2',opacity:.5}});}
+  }
+  const el=document.getElementById('chartB'); const c=charts.B||(charts.B=echarts.init(el));
+  c.setOption({tooltip:{trigger:'item',confine:true,formatter:p=>p.dataType==='edge'?`${p.data.source} → ${p.data.target}<br>${fmt(p.data.value)} ${T.contacts}`:`<b>${p.name}</b>`},
+    series:[{type:'sankey',left:8,right:130,top:12,bottom:12,nodeWidth:14,nodeGap:10,
+      label:{fontSize:10,formatter:p=>p.name},emphasis:{focus:'adjacency'},
+      data:nodes,links:links}]},true);
+}
+// sankey by recommendation (panel C)
+function panelC(r){
+  const withRec=r.eligible, woRec=Math.max(0,r.examined-r.eligible);
+  const init=Math.min(r.initiated,withRec), notInit=Math.max(0,withRec-init);
+  const compl=Math.min(r.completed,init), incompl=Math.max(0,init-compl);
+  const N=n=>({name:n}); const examined=DATA.stages.find(s=>s.key==='examined');
+  const nExam=stLab(examined);
+  const nodes=[{name:nExam,itemStyle:{color:'#5a9a3a'}},{name:T.withRec,itemStyle:{color:'#e07b2e'}},{name:T.woRec,itemStyle:{color:'#d9c84a'}},
+    {name:DATA.stages.find(s=>s.key==='initiated')[LANG],itemStyle:{color:'#1f8a76'}},{name:T.notInit,itemStyle:{color:'#c9c9c2'}},
+    {name:DATA.stages.find(s=>s.key==='completed')[LANG],itemStyle:{color:'#256abf'}},{name:T.incompl,itemStyle:{color:'#c9c9c2'}}];
+  const nInit=nodes[3].name;
+  const links=[
+    {source:nExam,target:T.withRec,value:withRec},{source:nExam,target:T.woRec,value:woRec},
+    {source:T.withRec,target:nInit,value:init},{source:T.withRec,target:T.notInit,value:notInit},
+    {source:T.woRec,target:T.notInit,value:woRec},
+    {source:nInit,target:nodes[5].name,value:compl},{source:nInit,target:T.incompl,value:incompl}
+  ].filter(l=>l.value>0).map(l=>({...l,lineStyle:{opacity:.45,color:'#8aa'}}));
+  const el=document.getElementById('chartC'); const c=charts.C||(charts.C=echarts.init(el));
+  c.setOption({tooltip:{trigger:'item',confine:true,formatter:p=>p.dataType==='edge'?`${p.data.source} → ${p.data.target}<br>${fmt(p.data.value)} ${T.contacts}`:`<b>${p.name}</b>`},
+    series:[{type:'sankey',left:8,right:130,top:12,bottom:12,nodeWidth:14,nodeGap:12,
+      label:{fontSize:10},emphasis:{focus:'adjacency'},data:nodes,links:links}]},true);
+}
+function keyPts(r){
+  const P=pctOf(r), st=DATA.stages; let worst={drop:-1,lab:''},prev=null,pk;
+  st.forEach(s=>{if(prev!=null){const d=P[pk]-P[s.key];if(d>worst.drop)worst={drop:d,lab:`${stLab(st[st.findIndex(x=>x.key===pk)])} → ${stLab(s)}`};}prev=P[s.key];pk=s.key;});
+  const items=T.kp(r,P,worst);
+  document.getElementById('keybox').innerHTML=`<div class="keypts"><div class="kp-h">${T.kpH}</div><ul>${items.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+}
+function render(){
+  const sc=document.getElementById('scope').value;
+  const sel=document.getElementById('sel2');
+  let r;
+  if(sc==='keseluruhan'){r=DATA.data.keseluruhan.ALL;document.getElementById('scopeNote').textContent='';}
+  else{
+    const keys=sc==='tahun'?DATA.tahun:Object.keys(DATA.data.kecamatan);
+    const cur=(sel&&sel.value)||keys[0];
+    r=DATA.data[sc][cur];
+    document.getElementById('scopeNote').innerHTML=`<select id="sel2">`+keys.map(k=>`<option ${k===cur?'selected':''} value="${k}">${sc==='kecamatan'?(DATA.kecName[k]||k):k}</option>`).join('')+`</select>`;
+    document.getElementById('sel2').onchange=render;
+  }
+  panelA(r);tableA(r);panelB(r);panelC(r);keyPts(r);
+  document.getElementById('foot').innerHTML='<b>'+(LANG==='id'?'Catatan.':'Note.')+'</b> '+T.foot;
+}
+addEventListener('resize',()=>Object.values(charts).forEach(c=>c&&c.resize()));
+fetch('data/ik_cascade.json').then(r=>r.json()).then(d=>{DATA=d;
+  document.getElementById('scope').onchange=render; render();})
+  .catch(e=>{document.getElementById('panelA').innerHTML='<div class="panel">'+T.fail+'</div>';});
+</script>
+</body>
+</html>
