@@ -1640,692 +1640,692 @@
  {
   "tabel": "tb06",
   "deskripsi": "Register terduga TBC (TB.06), 2021–2026",
-  "baris": 98280,
+  "baris": 264335,
   "kolom": [
    {
     "nama": "no_urut",
     "tipe": "bigint(20)",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "no_identitas_sediaan",
     "tipe": "text",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "no_rekam_medis",
     "tipe": "text",
-    "missing": 59197,
-    "terisi": 39083,
-    "pct_missing": 60.2
+    "missing": 133375,
+    "terisi": 130960,
+    "pct_missing": 50.5
    },
    {
     "nama": "tanggal_didaftar",
     "tipe": "text",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "bulan",
     "tipe": "text",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "nik_nomor_identitas_kependudukan",
     "tipe": "text",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "no_register_sitb",
     "tipe": "text",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "no_register_terduga",
     "tipe": "text",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "no_bpjs",
     "tipe": "text",
-    "missing": 88508,
-    "terisi": 9772,
-    "pct_missing": 90.1
+    "missing": 252044,
+    "terisi": 12291,
+    "pct_missing": 95.4
    },
    {
     "nama": "status_diagnosis",
     "tipe": "text",
-    "missing": 1242,
-    "terisi": 97038,
-    "pct_missing": 1.3
+    "missing": 2781,
+    "terisi": 261554,
+    "pct_missing": 1.1
    },
    {
     "nama": "nama_lengkap_terduga_tbc",
     "tipe": "text",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "umur_tahun",
     "tipe": "bigint(20)",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "jenis_kelamin",
     "tipe": "text",
-    "missing": 11,
-    "terisi": 98269,
+    "missing": 62,
+    "terisi": 264273,
     "pct_missing": 0.0
    },
    {
     "nama": "alamat_lengkap_faskes_provinsi",
     "tipe": "text",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "alamat_lengkap_faskes_kabupaten_kota",
     "tipe": "text",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "alamat_lengkap_faskes_jenis_fasyankes",
     "tipe": "text",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "alamat_lengkap_faskes_kepemilikan_fasyankes",
     "tipe": "text",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "alamat_lengkap_faskes_kode_fasyankes",
     "tipe": "text",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "alamat_lengkap_faskes_nama_fasyankes",
     "tipe": "text",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "alamat_lengkap_terduga_tbc_provinsi",
     "tipe": "text",
-    "missing": 4,
-    "terisi": 98276,
+    "missing": 16,
+    "terisi": 264319,
     "pct_missing": 0.0
    },
    {
     "nama": "alamat_lengkap_terduga_tbc_kabupaten_kota",
     "tipe": "text",
-    "missing": 25,
-    "terisi": 98255,
+    "missing": 108,
+    "terisi": 264227,
     "pct_missing": 0.0
    },
    {
     "nama": "alamat_lengkap_terduga_tbc_kecamatan",
     "tipe": "text",
-    "missing": 1870,
-    "terisi": 96410,
-    "pct_missing": 1.9
+    "missing": 3908,
+    "terisi": 260427,
+    "pct_missing": 1.5
    },
    {
     "nama": "alamat_lengkap_terduga_tbc_kelurahan",
     "tipe": "text",
-    "missing": 2458,
-    "terisi": 95822,
-    "pct_missing": 2.5
+    "missing": 5449,
+    "terisi": 258886,
+    "pct_missing": 2.1
    },
    {
     "nama": "alamat_lengkap_terduga_tbc_alamat_lengkap",
     "tipe": "text",
-    "missing": 5,
-    "terisi": 98275,
+    "missing": 41,
+    "terisi": 264294,
     "pct_missing": 0.0
    },
    {
     "nama": "dirujuk_dikirim_oleh",
     "tipe": "text",
-    "missing": 11,
-    "terisi": 98269,
-    "pct_missing": 0.0
+    "missing": 316,
+    "terisi": 264019,
+    "pct_missing": 0.1
    },
    {
     "nama": "klasifikasi_berdasarkan_riwayat_pengobatan_sebelumnya",
     "tipe": "text",
-    "missing": 5,
-    "terisi": 98275,
+    "missing": 14,
+    "terisi": 264321,
     "pct_missing": 0.0
    },
    {
     "nama": "kriteria_terduga_tbc_ro",
     "tipe": "text",
-    "missing": 91020,
-    "terisi": 7260,
-    "pct_missing": 92.6
+    "missing": 246611,
+    "terisi": 17724,
+    "pct_missing": 93.3
    },
    {
     "nama": "lokasi_anatomi_penyakit",
     "tipe": "text",
-    "missing": 219,
-    "terisi": 98061,
+    "missing": 459,
+    "terisi": 263876,
     "pct_missing": 0.2
    },
    {
     "nama": "total_skoring_tbc_anak",
     "tipe": "bigint(20)",
-    "missing": 80458,
-    "terisi": 17822,
-    "pct_missing": 81.9
+    "missing": 210377,
+    "terisi": 53958,
+    "pct_missing": 79.6
    },
    {
     "nama": "hasil_pemeriksaan_foto_toraks",
     "tipe": "text",
-    "missing": 1206,
-    "terisi": 97074,
-    "pct_missing": 1.2
+    "missing": 2741,
+    "terisi": 261594,
+    "pct_missing": 1.0
    },
    {
     "nama": "dilakukan_pemeriksaan_tuberkulin_igra",
     "tipe": "text",
-    "missing": 80396,
-    "terisi": 17884,
-    "pct_missing": 81.8
+    "missing": 212689,
+    "terisi": 51646,
+    "pct_missing": 80.5
    },
    {
     "nama": "hasil_pemeriksaan_tuberkulin_igra",
     "tipe": "text",
-    "missing": 80399,
-    "terisi": 17881,
-    "pct_missing": 81.8
+    "missing": 212728,
+    "terisi": 51607,
+    "pct_missing": 80.5
    },
    {
     "nama": "status_hiv",
     "tipe": "text",
-    "missing": 12,
-    "terisi": 98268,
+    "missing": 39,
+    "terisi": 264296,
     "pct_missing": 0.0
    },
    {
     "nama": "riwayat_diabetes_melitus",
     "tipe": "text",
-    "missing": 1,
-    "terisi": 98279,
+    "missing": 3,
+    "terisi": 264332,
     "pct_missing": 0.0
    },
    {
     "nama": "hasil_pemeriksaan_mikroskopis_tanggal_pemeriksaan_1",
     "tipe": "text",
-    "missing": 87204,
-    "terisi": 11076,
-    "pct_missing": 88.7
+    "missing": 243014,
+    "terisi": 21321,
+    "pct_missing": 91.9
    },
    {
     "nama": "hasil_pemeriksaan_mikroskopis_hasil_pemeriksaan_1",
     "tipe": "text",
-    "missing": 88212,
-    "terisi": 10068,
-    "pct_missing": 89.8
+    "missing": 244465,
+    "terisi": 19870,
+    "pct_missing": 92.5
    },
    {
     "nama": "hasil_pemeriksaan_mikroskopis_tanggal_pemeriksaan_2",
     "tipe": "text",
-    "missing": 88705,
-    "terisi": 9575,
-    "pct_missing": 90.3
+    "missing": 247550,
+    "terisi": 16785,
+    "pct_missing": 93.7
    },
    {
     "nama": "hasil_pemeriksaan_mikroskopis_hasil_pemeriksaan_2",
     "tipe": "text",
-    "missing": 89782,
-    "terisi": 8498,
-    "pct_missing": 91.4
+    "missing": 249284,
+    "terisi": 15051,
+    "pct_missing": 94.3
    },
    {
     "nama": "tanggal_hasil_pemeriksaan_diagnosis_tbc",
     "tipe": "text",
-    "missing": 26745,
-    "terisi": 71535,
-    "pct_missing": 27.2
+    "missing": 82786,
+    "terisi": 181549,
+    "pct_missing": 31.3
    },
    {
     "nama": "hasil_pemeriksaan_diagnosis_tbc",
     "tipe": "text",
-    "missing": 26745,
-    "terisi": 71535,
-    "pct_missing": 27.2
+    "missing": 82786,
+    "terisi": 181549,
+    "pct_missing": 31.3
    },
    {
     "nama": "jenis_pemeriksaan_diagnosis",
     "tipe": "text",
-    "missing": 26745,
-    "terisi": 71535,
-    "pct_missing": 27.2
+    "missing": 82786,
+    "terisi": 181549,
+    "pct_missing": 31.3
    },
    {
     "nama": "tanggal_hasil_pemeriksaan_tcm_xdr",
     "tipe": "text",
-    "missing": 98099,
-    "terisi": 181,
+    "missing": 263681,
+    "terisi": 654,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_xpert_tcm_xdr_valid_invalid_error_no_resul",
     "tipe": "text",
-    "missing": 98100,
-    "terisi": 180,
-    "pct_missing": 99.8
+    "missing": 263663,
+    "terisi": 672,
+    "pct_missing": 99.7
    },
    {
     "nama": "hasil_pemeriksaan_xpert_tcm_xdr_mtb",
     "tipe": "text",
-    "missing": 98100,
-    "terisi": 180,
-    "pct_missing": 99.8
+    "missing": 263663,
+    "terisi": 672,
+    "pct_missing": 99.7
    },
    {
     "nama": "hasil_pemeriksaan_xpert_tcm_xdr_h_dosis_rendah_low",
     "tipe": "text",
-    "missing": 98132,
-    "terisi": 148,
+    "missing": 263762,
+    "terisi": 573,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_xpert_tcm_xdr_h",
     "tipe": "text",
-    "missing": 98132,
-    "terisi": 148,
+    "missing": 263762,
+    "terisi": 573,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_xpert_tcm_xdr_eto",
     "tipe": "text",
-    "missing": 98132,
-    "terisi": 148,
+    "missing": 263762,
+    "terisi": 573,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_xpert_tcm_xdr_fq_dosis_rendah_low",
     "tipe": "text",
-    "missing": 98132,
-    "terisi": 148,
+    "missing": 263762,
+    "terisi": 573,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_xpert_tcm_xdr_fq",
     "tipe": "text",
-    "missing": 98132,
-    "terisi": 148,
+    "missing": 263762,
+    "terisi": 573,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_xpert_tcm_xdr_amk",
     "tipe": "text",
-    "missing": 98132,
-    "terisi": 148,
+    "missing": 263762,
+    "terisi": 573,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_xpert_tcm_xdr_km",
     "tipe": "text",
-    "missing": 98132,
-    "terisi": 148,
+    "missing": 263762,
+    "terisi": 573,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_xpert_tcm_xdr_cm",
     "tipe": "text",
-    "missing": 98132,
-    "terisi": 148,
+    "missing": 263762,
+    "terisi": 573,
     "pct_missing": 99.8
    },
    {
     "nama": "tanggal_hasil_pemeriksaan_lpa_lini_1",
     "tipe": "text",
-    "missing": 98201,
-    "terisi": 79,
+    "missing": 264115,
+    "terisi": 220,
     "pct_missing": 99.9
    },
    {
     "nama": "hasil_pemeriksaan_lpa_line_probe_assay_lini_1_invalid",
     "tipe": "text",
-    "missing": 98197,
-    "terisi": 83,
+    "missing": 264104,
+    "terisi": 231,
     "pct_missing": 99.9
    },
    {
     "nama": "hasil_pemeriksaan_lpa_line_probe_assay_lini_1_mtb",
     "tipe": "text",
-    "missing": 98201,
-    "terisi": 79,
+    "missing": 264114,
+    "terisi": 221,
     "pct_missing": 99.9
    },
    {
     "nama": "hasil_pemeriksaan_lpa_line_probe_assay_lini_1_r",
     "tipe": "text",
-    "missing": 98217,
-    "terisi": 63,
+    "missing": 264157,
+    "terisi": 178,
     "pct_missing": 99.9
    },
    {
     "nama": "hasil_pemeriksaan_lpa_line_probe_assay_lini_1_h",
     "tipe": "text",
-    "missing": 98217,
-    "terisi": 63,
+    "missing": 264157,
+    "terisi": 178,
     "pct_missing": 99.9
    },
    {
     "nama": "tanggal_hasil_pemeriksaan_lpa_lini_2",
     "tipe": "text",
-    "missing": 98128,
-    "terisi": 152,
-    "pct_missing": 99.8
+    "missing": 264084,
+    "terisi": 251,
+    "pct_missing": 99.9
    },
    {
     "nama": "hasil_pemeriksaan_lpa_line_probe_assay_lini_2_invalid",
     "tipe": "text",
-    "missing": 98128,
-    "terisi": 152,
-    "pct_missing": 99.8
+    "missing": 264084,
+    "terisi": 251,
+    "pct_missing": 99.9
    },
    {
     "nama": "hasil_pemeriksaan_lpa_line_probe_assay_lini_2_mtb",
     "tipe": "text",
-    "missing": 98130,
-    "terisi": 150,
-    "pct_missing": 99.8
+    "missing": 264086,
+    "terisi": 249,
+    "pct_missing": 99.9
    },
    {
     "nama": "hasil_pemeriksaan_lpa_line_probe_assay_lini_2_lfx",
     "tipe": "text",
-    "missing": 98148,
-    "terisi": 132,
+    "missing": 264114,
+    "terisi": 221,
     "pct_missing": 99.9
    },
    {
     "nama": "hasil_pemeriksaan_lpa_line_probe_assay_lini_2_mfx",
     "tipe": "text",
-    "missing": 98151,
-    "terisi": 129,
+    "missing": 264117,
+    "terisi": 218,
     "pct_missing": 99.9
    },
    {
     "nama": "hasil_pemeriksaan_lpa_line_probe_assay_lini_2_mfx_dt",
     "tipe": "text",
-    "missing": 98150,
-    "terisi": 130,
+    "missing": 264116,
+    "terisi": 219,
     "pct_missing": 99.9
    },
    {
     "nama": "hasil_pemeriksaan_lpa_line_probe_assay_lini_2_km",
     "tipe": "text",
-    "missing": 98148,
-    "terisi": 132,
+    "missing": 264114,
+    "terisi": 221,
     "pct_missing": 99.9
    },
    {
     "nama": "hasil_pemeriksaan_lpa_line_probe_assay_lini_2_amk",
     "tipe": "text",
-    "missing": 98148,
-    "terisi": 132,
+    "missing": 264114,
+    "terisi": 221,
     "pct_missing": 99.9
    },
    {
     "nama": "hasil_pemeriksaan_lpa_line_probe_assay_lini_2_cm",
     "tipe": "text",
-    "missing": 98148,
-    "terisi": 132,
+    "missing": 264114,
+    "terisi": 221,
     "pct_missing": 99.9
    },
    {
     "nama": "tanggal_hasil_pemeriksaan_biakan",
     "tipe": "text",
-    "missing": 98048,
-    "terisi": 232,
+    "missing": 263735,
+    "terisi": 600,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_biakan",
     "tipe": "text",
-    "missing": 98050,
-    "terisi": 230,
+    "missing": 263736,
+    "terisi": 599,
     "pct_missing": 99.8
    },
    {
     "nama": "tanggal_hasil_pemeriksaan_uji_kepekaan",
     "tipe": "text",
-    "missing": 98082,
-    "terisi": 198,
+    "missing": 263830,
+    "terisi": 505,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_paket_standar_uji_kepekaan_h_dosis_tinggi",
     "tipe": "text",
-    "missing": 98083,
-    "terisi": 197,
+    "missing": 263833,
+    "terisi": 502,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_paket_standar_uji_kepekaan_h",
     "tipe": "text",
-    "missing": 98083,
-    "terisi": 197,
+    "missing": 263832,
+    "terisi": 503,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_paket_standar_uji_kepekaan_km",
     "tipe": "text",
-    "missing": 98083,
-    "terisi": 197,
+    "missing": 263833,
+    "terisi": 502,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_paket_standar_uji_kepekaan_cm",
     "tipe": "text",
-    "missing": 98083,
-    "terisi": 197,
+    "missing": 263832,
+    "terisi": 503,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_paket_standar_uji_kepekaan_lfx",
     "tipe": "text",
-    "missing": 98083,
-    "terisi": 197,
+    "missing": 263832,
+    "terisi": 503,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_paket_standar_uji_kepekaan_mfx_dosis_tingg",
     "tipe": "text",
-    "missing": 98083,
-    "terisi": 197,
+    "missing": 263832,
+    "terisi": 503,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_paket_standar_uji_kepekaan_mfx",
     "tipe": "text",
-    "missing": 98083,
-    "terisi": 197,
+    "missing": 263832,
+    "terisi": 503,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_paket_standar_uji_kepekaan",
     "tipe": "text",
-    "missing": 98084,
-    "terisi": 196,
+    "missing": 263832,
+    "terisi": 503,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_paket_standar_uji_kepekaan_2",
     "tipe": "text",
-    "missing": 98123,
-    "terisi": 157,
+    "missing": 263872,
+    "terisi": 463,
     "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_paket_standar_uji_kepekaan_3",
     "tipe": "text",
-    "missing": 98152,
-    "terisi": 128,
-    "pct_missing": 99.9
+    "missing": 263904,
+    "terisi": 431,
+    "pct_missing": 99.8
    },
    {
     "nama": "hasil_pemeriksaan_paket_standar_uji_kepekaan_4",
     "tipe": "text",
-    "missing": 98199,
-    "terisi": 81,
+    "missing": 264087,
+    "terisi": 248,
     "pct_missing": 99.9
    },
    {
     "nama": "hasil_pemeriksaan_paket_standar_uji_kepekaan_5",
     "tipe": "text",
-    "missing": 98254,
+    "missing": 264309,
     "terisi": 26,
     "pct_missing": 100.0
    },
    {
     "nama": "hasil_pemeriksaan_paket_standar_uji_kepekaan_6",
     "tipe": "text",
-    "missing": 98280,
+    "missing": 264335,
     "terisi": 0,
     "pct_missing": 100.0
    },
    {
     "nama": "terkonfirmasi_tbc",
     "tipe": "text",
-    "missing": 77834,
-    "terisi": 20446,
-    "pct_missing": 79.2
+    "missing": 184861,
+    "terisi": 79474,
+    "pct_missing": 69.9
    },
    {
     "nama": "tanggal_hasil_diagnosis",
     "tipe": "text",
-    "missing": 1142,
-    "terisi": 97138,
-    "pct_missing": 1.2
+    "missing": 2520,
+    "terisi": 261815,
+    "pct_missing": 1.0
    },
    {
     "nama": "hasil_diagnosis",
     "tipe": "text",
-    "missing": 1206,
-    "terisi": 97074,
-    "pct_missing": 1.2
+    "missing": 2741,
+    "terisi": 261594,
+    "pct_missing": 1.0
    },
    {
     "nama": "tipe_diagnosis",
     "tipe": "text",
-    "missing": 77891,
-    "terisi": 20389,
-    "pct_missing": 79.3
+    "missing": 185056,
+    "terisi": 79279,
+    "pct_missing": 70.0
    },
    {
     "nama": "tindak_lanjut",
     "tipe": "text",
-    "missing": 77898,
-    "terisi": 20382,
-    "pct_missing": 79.3
+    "missing": 185072,
+    "terisi": 79263,
+    "pct_missing": 70.0
    },
    {
     "nama": "tempat_pengobatan_dirujuk_ke_nama_fasyankes",
     "tipe": "text",
-    "missing": 91008,
-    "terisi": 7272,
-    "pct_missing": 92.6
+    "missing": 253643,
+    "terisi": 10692,
+    "pct_missing": 96.0
    },
    {
     "nama": "tempat_pengobatan_tidak_dirujuk",
     "tipe": "text",
-    "missing": 87496,
-    "terisi": 10784,
-    "pct_missing": 89.0
+    "missing": 204411,
+    "terisi": 59924,
+    "pct_missing": 77.3
    },
    {
     "nama": "tanggal_mulai_pengobatan_tbc_tgl_bln_thn",
     "tipe": "text",
-    "missing": 80466,
-    "terisi": 17814,
-    "pct_missing": 81.9
+    "missing": 194514,
+    "terisi": 69821,
+    "pct_missing": 73.6
    },
    {
     "nama": "tanggal_tes_hiv",
     "tipe": "text",
-    "missing": 88806,
-    "terisi": 9474,
-    "pct_missing": 90.4
+    "missing": 233110,
+    "terisi": 31225,
+    "pct_missing": 88.2
    },
    {
     "nama": "hasil_tes_hiv",
     "tipe": "text",
-    "missing": 88105,
-    "terisi": 10175,
-    "pct_missing": 89.6
+    "missing": 218118,
+    "terisi": 46217,
+    "pct_missing": 82.5
    },
    {
     "nama": "art",
     "tipe": "text",
-    "missing": 98177,
-    "terisi": 103,
-    "pct_missing": 99.9
+    "missing": 263559,
+    "terisi": 776,
+    "pct_missing": 99.7
    },
    {
     "nama": "hasil_tes_dm",
     "tipe": "text",
-    "missing": 88819,
-    "terisi": 9461,
-    "pct_missing": 90.4
+    "missing": 228133,
+    "terisi": 36202,
+    "pct_missing": 86.3
    },
    {
-    "nama": "keterangan_diisi_tempat_pemeriksaan_selain_mikroskopis",
+    "nama": "keterangan",
     "tipe": "text",
-    "missing": 92684,
-    "terisi": 5596,
-    "pct_missing": 94.3
+    "missing": 250583,
+    "terisi": 13752,
+    "pct_missing": 94.8
    },
    {
     "nama": "tindak_lanjut_penambahan_resistansi",
     "tipe": "text",
-    "missing": 98264,
-    "terisi": 16,
+    "missing": 264302,
+    "terisi": 33,
     "pct_missing": 100.0
    },
    {
     "nama": "tahun_laporan",
     "tipe": "bigint(20)",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    },
    {
     "nama": "sumber_file",
     "tipe": "text",
     "missing": 0,
-    "terisi": 98280,
+    "terisi": 264335,
     "pct_missing": 0.0
    }
   ]

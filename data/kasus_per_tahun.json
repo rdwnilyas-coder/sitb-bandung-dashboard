@@ -42,7 +42,7 @@
  {
   "tahun": 2023,
   "register": "Terduga TBC (TB.06)",
-  "jumlah": 16380
+  "jumlah": 57332
  },
  {
   "tahun": 2024,
@@ -57,7 +57,7 @@
  {
   "tahun": 2024,
   "register": "Terduga TBC (TB.06)",
-  "jumlah": 16380
+  "jumlah": 64501
  },
  {
   "tahun": 2025,
@@ -72,7 +72,7 @@
  {
   "tahun": 2025,
   "register": "Terduga TBC (TB.06)",
-  "jumlah": 16380
+  "jumlah": 73664
  },
  {
   "tahun": 2026,
@@ -87,6 +87,6 @@
  {
   "tahun": 2026,
   "register": "Terduga TBC (TB.06)",
-  "jumlah": 16380
+  "jumlah": 36078
  }
 ]
