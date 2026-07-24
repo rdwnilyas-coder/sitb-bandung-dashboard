@@ -129,13 +129,15 @@ function panelA(r){
   const P=pctOf(r), stages=DATA.stages;
   const el=document.getElementById('chartA'); const c=charts.A||(charts.A=echarts.init(el));
   c.setOption({
-    grid:{left:52,right:20,top:20,bottom:64},
+    grid:{left:54,right:26,top:52,bottom:70},
+    title:{text:T.yaxis,left:2,top:6,textStyle:{fontSize:11,color:'#52514e',fontWeight:'normal'}},
     tooltip:{trigger:'axis',confine:true,formatter:p=>{const i=p[0].dataIndex,s=stages[i];return `<b>${stLab(s)}</b><br>${fmt(r[s.key])} ${T.contacts} · ${P[s.key]}%`;}},
     xAxis:{type:'category',data:stages.map(s=>stLab(s)),axisLabel:{interval:0,fontSize:10,rotate:20,formatter:v=>v.length>15?v.slice(0,15)+'…':v}},
-    yAxis:{type:'value',min:0,max:100,name:T.yaxis,nameTextStyle:{fontSize:10},axisLabel:{formatter:'{value}%'}},
+    yAxis:{type:'value',min:0,max:100,axisLabel:{formatter:'{value}%'}},
     series:[{type:'line',step:'end',data:stages.map(s=>P[s.key]),symbol:'circle',symbolSize:9,
       lineStyle:{color:'#8a94a6',width:2},itemStyle:{color:'#c0392b'},
-      label:{show:true,position:'top',fontSize:10,formatter:p=>`${fmt(r[stages[p.dataIndex].key])} · ${P[stages[p.dataIndex].key]}%`}}]
+      label:{show:true,position:'top',distance:8,fontSize:10,fontWeight:'bold',color:'#0F2E4E',
+        formatter:p=>`${fmt(r[stages[p.dataIndex].key])} · ${P[stages[p.dataIndex].key]}%`}}]
   },true);
 }
 function tableA(r){
@@ -150,41 +152,48 @@ function tableA(r){
 // sankey losses (panel B): tiap tahap -> lanjut (tahap berikut) + hilang
 function panelB(r){
   const st=DATA.stages, nodes=[], links=[];
-  st.forEach((s,i)=>nodes.push({name:stLab(s),itemStyle:{color:STCOL[i]}}));
+  const pc=v=>r.ref?Math.round(100*v/r.ref):null;
+  st.forEach((s,i)=>nodes.push({name:stLab(s),value:r[s.key],pct:pc(r[s.key]),itemStyle:{color:STCOL[i]}}));
   for(let i=0;i<st.length-1;i++){
     const cur=r[st[i].key], nxt=r[st[i+1].key];
     const cont=Math.min(nxt,cur), loss=Math.max(0,cur-nxt);
     links.push({source:stLab(st[i]),target:stLab(st[i+1]),value:Math.max(cont,0),lineStyle:{color:STCOL[i+1],opacity:.45}});
-    if(loss>0){const ln=`${T.loss} @ ${stLab(st[i])}`;nodes.push({name:ln,itemStyle:{color:'#c9c9c2'}});
+    if(loss>0){const ln=`${T.loss} @ ${stLab(st[i])}`;nodes.push({name:ln,value:loss,pct:pc(loss),itemStyle:{color:'#c9c9c2'}});
       links.push({source:stLab(st[i]),target:ln,value:loss,lineStyle:{color:'#c9c9c2',opacity:.5}});}
   }
   const el=document.getElementById('chartB'); const c=charts.B||(charts.B=echarts.init(el));
-  c.setOption({tooltip:{trigger:'item',confine:true,formatter:p=>p.dataType==='edge'?`${p.data.source} → ${p.data.target}<br>${fmt(p.data.value)} ${T.contacts}`:`<b>${p.name}</b>`},
-    series:[{type:'sankey',left:8,right:130,top:12,bottom:12,nodeWidth:14,nodeGap:10,
-      label:{fontSize:10,formatter:p=>p.name},emphasis:{focus:'adjacency'},
-      data:nodes,links:links}]},true);
+  c.setOption({tooltip:{trigger:'item',confine:true,formatter:p=>p.dataType==='edge'?`${p.data.source} → ${p.data.target}<br>${fmt(p.data.value)} ${T.contacts}`:`<b>${p.name}</b><br>${fmt(p.data.value)} ${T.contacts}${p.data.pct!=null?' · '+p.data.pct+'%':''}`},
+    series:[{type:'sankey',left:8,right:150,top:12,bottom:12,nodeWidth:14,nodeGap:11,
+      label:{fontSize:9.5,color:'#0b0b0b',formatter:p=>`${p.name}\n${fmt(p.data.value)}${p.data.pct!=null?' · '+p.data.pct+'%':''}`},
+      emphasis:{focus:'adjacency'},data:nodes,links:links}]},true);
 }
 // sankey by recommendation (panel C)
 function panelC(r){
   const withRec=r.eligible, woRec=Math.max(0,r.examined-r.eligible);
   const init=Math.min(r.initiated,withRec), notInit=Math.max(0,withRec-init);
   const compl=Math.min(r.completed,init), incompl=Math.max(0,init-compl);
-  const N=n=>({name:n}); const examined=DATA.stages.find(s=>s.key==='examined');
-  const nExam=stLab(examined);
-  const nodes=[{name:nExam,itemStyle:{color:'#5a9a3a'}},{name:T.withRec,itemStyle:{color:'#e07b2e'}},{name:T.woRec,itemStyle:{color:'#d9c84a'}},
-    {name:DATA.stages.find(s=>s.key==='initiated')[LANG],itemStyle:{color:'#1f8a76'}},{name:T.notInit,itemStyle:{color:'#c9c9c2'}},
-    {name:DATA.stages.find(s=>s.key==='completed')[LANG],itemStyle:{color:'#256abf'}},{name:T.incompl,itemStyle:{color:'#c9c9c2'}}];
-  const nInit=nodes[3].name;
+  const examined=DATA.stages.find(s=>s.key==='examined');
+  const nExam=stLab(examined), pc=v=>r.examined?Math.round(100*v/r.examined):null;
+  const nInit=DATA.stages.find(s=>s.key==='initiated')[LANG], nCompl=DATA.stages.find(s=>s.key==='completed')[LANG];
+  const nodes=[
+    {name:nExam,value:r.examined,pct:100,itemStyle:{color:'#5a9a3a'}},
+    {name:T.withRec,value:withRec,pct:pc(withRec),itemStyle:{color:'#e07b2e'}},
+    {name:T.woRec,value:woRec,pct:pc(woRec),itemStyle:{color:'#d9c84a'}},
+    {name:nInit,value:init,pct:pc(init),itemStyle:{color:'#1f8a76'}},
+    {name:T.notInit,value:notInit+woRec,pct:pc(notInit+woRec),itemStyle:{color:'#c9c9c2'}},
+    {name:nCompl,value:compl,pct:pc(compl),itemStyle:{color:'#256abf'}},
+    {name:T.incompl,value:incompl,pct:pc(incompl),itemStyle:{color:'#c9c9c2'}}];
   const links=[
     {source:nExam,target:T.withRec,value:withRec},{source:nExam,target:T.woRec,value:woRec},
     {source:T.withRec,target:nInit,value:init},{source:T.withRec,target:T.notInit,value:notInit},
     {source:T.woRec,target:T.notInit,value:woRec},
-    {source:nInit,target:nodes[5].name,value:compl},{source:nInit,target:T.incompl,value:incompl}
+    {source:nInit,target:nCompl,value:compl},{source:nInit,target:T.incompl,value:incompl}
   ].filter(l=>l.value>0).map(l=>({...l,lineStyle:{opacity:.45,color:'#8aa'}}));
   const el=document.getElementById('chartC'); const c=charts.C||(charts.C=echarts.init(el));
-  c.setOption({tooltip:{trigger:'item',confine:true,formatter:p=>p.dataType==='edge'?`${p.data.source} → ${p.data.target}<br>${fmt(p.data.value)} ${T.contacts}`:`<b>${p.name}</b>`},
-    series:[{type:'sankey',left:8,right:130,top:12,bottom:12,nodeWidth:14,nodeGap:12,
-      label:{fontSize:10},emphasis:{focus:'adjacency'},data:nodes,links:links}]},true);
+  c.setOption({tooltip:{trigger:'item',confine:true,formatter:p=>p.dataType==='edge'?`${p.data.source} → ${p.data.target}<br>${fmt(p.data.value)} ${T.contacts}`:`<b>${p.name}</b><br>${fmt(p.data.value)} ${T.contacts}${p.data.pct!=null?' · '+p.data.pct+'%':''}`},
+    series:[{type:'sankey',left:8,right:150,top:12,bottom:12,nodeWidth:14,nodeGap:12,
+      label:{fontSize:9.5,color:'#0b0b0b',formatter:p=>`${p.name}\n${fmt(p.data.value)}${p.data.pct!=null?' · '+p.data.pct+'%':''}`},
+      emphasis:{focus:'adjacency'},data:nodes,links:links}]},true);
 }
 function keyPts(r){
   const P=pctOf(r), st=DATA.stages; let worst={drop:-1,lab:''},prev=null,pk;
